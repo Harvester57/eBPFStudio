@@ -6,9 +6,10 @@
 #include "resource.h"
 
 #include "aboutdlg.h"
-#include "ProgramsView.h"
 #include "MainFrm.h"
 #include <ToolbarHelper.h>
+#include "ProgramsView.h"
+#include "MapsView.h"
 
 #define WINDOW_MENU_POSITION	4
 
@@ -51,11 +52,12 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CreateSimpleStatusBar();
 
+	m_Tabs.m_bTabCloseButton = false;
 	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 4, 4);
-	UINT ids[] = { IDR_MAINFRAME };
+	UINT ids[] = { IDR_MAINFRAME, IDI_MAPS };
 	for (auto id : ids)
 		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
 	m_Tabs.SetImageList(images);
@@ -98,9 +100,16 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 }
 
 LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	auto pView = new CProgramsView(this);
-	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_Tabs.AddPage(pView->m_hWnd, _T("Programs"), 0, pView);
+	{
+		auto view = new CProgramsView(this);
+		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+		m_Tabs.AddPage(view->m_hWnd, L"Programs", 0);
+	}
+	{
+		auto view = new CMapsView(this);
+		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+		m_Tabs.AddPage(view->m_hWnd, L"Maps", 1);
+	}
 
 	return 0;
 }

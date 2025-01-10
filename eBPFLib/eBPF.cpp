@@ -2,7 +2,7 @@
 #include "eBPF.h"
 #include <bpf\bpf.h>
 
-std::vector<BpfProgram> BPF::EnumPrograms(bool includeMapInfo) {
+std::vector<BpfProgram> BPF::EnumPrograms() {
     uint32_t id = 0;
     std::vector<BpfProgram> programs;
     programs.reserve(8);
@@ -34,4 +34,39 @@ std::vector<BpfProgram> BPF::EnumPrograms(bool includeMapInfo) {
         programs.push_back(std::move(p));
     }
     return programs;
+}
+
+std::vector<BpfMap> BPF::EnumMaps() {
+    uint32_t id = 0;
+    std::vector<BpfMap> maps;
+    maps.reserve(8);
+    for (;;) {
+        auto err = bpf_map_get_next_id(id, &id);
+        if (err)
+            break;
+
+        auto fd = bpf_map_get_fd_by_id(id);
+        if (fd < 0)
+            break;
+
+        bpf_map_info info{};
+        uint32_t size = sizeof(info);
+        err = bpf_obj_get_info_by_fd(fd, &info, &size);
+        if (err)
+            break;
+
+        BpfMap map;
+        map.Name = info.name;
+        map.Id = info.id;
+        map.InnerMapId = info.inner_map_id;
+        map.Flags = info.map_flags;
+        map.Type = (BpfMapType)info.type;
+        map.KeySize = info.key_size;
+        map.ValueSize = info.value_size;
+        map.MaxEntries = info.max_entries;
+        map.PinnedPathCount = info.pinned_path_count;
+
+        maps.push_back(std::move(map));
+    }
+    return maps;
 }

@@ -222,6 +222,7 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="eBPFStudio.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MapsView.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -235,6 +236,7 @@
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="IMainFrame.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MapsView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ProgramsView.h" />
@@ -244,6 +246,7 @@
     <ResourceCompile Include="eBPFStudio.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\Database.ico" />
     <Image Include="res\eBPFStudio.ico" />
     <Image Include="res\refresh.ico" />
   </ItemGroup>

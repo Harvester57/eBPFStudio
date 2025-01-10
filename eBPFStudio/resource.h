@@ -6,6 +6,8 @@
 #define IDR_MAINFRAME                   128
 #define IDI_ICON1                       201
 #define IDI_REFRESH                     201
+#define IDI_ICON2                       203
+#define IDI_MAPS                        203
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS                      32775
@@ -16,7 +18,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        203
+#define _APS_NEXT_RESOURCE_VALUE        204
 #define _APS_NEXT_COMMAND_VALUE         32778
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101

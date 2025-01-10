@@ -37,7 +37,7 @@ LRESULT CProgramsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Type", LVCFMT_LEFT, 100, ColumnType::Type);
 	cm->AddColumn(L"Maps", LVCFMT_RIGHT, 60, ColumnType::MapCount);
 	cm->AddColumn(L"Links", LVCFMT_RIGHT, 60, ColumnType::LinkCount);
-	cm->AddColumn(L"Pinned Paths", LVCFMT_RIGHT, 60, ColumnType::PinnedPathCount);
+	cm->AddColumn(L"Pinned Paths", LVCFMT_RIGHT, 80, ColumnType::PinnedPathCount);
 
 	Refresh();
 

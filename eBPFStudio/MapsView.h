@@ -4,22 +4,21 @@
 #include <VirtualListView.h>
 #include "IMainFrame.h"
 #include <eBPF.h>
+#include <CustomSplitterWindow.h>
 
-class CProgramsView : 
-	public CFrameView<CProgramsView, IMainFrame>,
-	public CVirtualListView<CProgramsView> {
+class CMapsView :
+	public CFrameView<CMapsView, IMainFrame>,
+	public CVirtualListView<CMapsView> {
 public:
 	using CFrameView::CFrameView;
 
 	DECLARE_WND_CLASS(nullptr)
 
-	BOOL PreTranslateMessage(MSG* pMsg);
-
 	CString GetColumnText(HWND hWnd, int row, int column) const;
 
-	BEGIN_MSG_MAP(CProgramsView)
+	BEGIN_MSG_MAP(CMapsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		CHAIN_MSG_MAP(CVirtualListView<CProgramsView>)
+		CHAIN_MSG_MAP(CVirtualListView<CMapsView>)
 		CHAIN_MSG_MAP(BaseFrame)
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
@@ -32,7 +31,7 @@ public:
 
 protected:
 	enum class ColumnType {
-		Name, Id, LinkCount, MapCount, GuidType, Type, PinnedPathCount, 
+		Name, Id, KeySize, ValueSize, Type, PinnedPathCount, MaxEntries,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -41,6 +40,7 @@ protected:
 	void Refresh();
 
 private:
+	CCustomHorSplitterWindow m_Splitter;
 	CListViewCtrl m_List;
-	std::vector<BpfProgram> m_Programs;
+	std::vector<BpfMap> m_Maps;
 };
