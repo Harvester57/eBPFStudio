@@ -6,8 +6,9 @@
 #include "resource.h"
 
 #include "aboutdlg.h"
-#include "View.h"
+#include "ProgramsView.h"
 #include "MainFrm.h"
+#include <ToolbarHelper.h>
 
 #define WINDOW_MENU_POSITION	4
 
@@ -15,7 +16,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg))
 		return TRUE;
 
-	return m_view.PreTranslateMessage(pMsg);
+	return m_Tabs.PreTranslateMessage(pMsg);
 }
 
 BOOL CMainFrame::OnIdle() {
@@ -24,26 +25,25 @@ BOOL CMainFrame::OnIdle() {
 }
 
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
-	// create command bar window
-	HWND hWndCmdBar = m_CmdBar.Create(m_hWnd, rcDefault, nullptr, ATL_SIMPLE_CMDBAR_PANE_STYLE);
-	// attach menu
-	m_CmdBar.AttachMenu(GetMenu());
-	// load command bar images
-	m_CmdBar.LoadImages(IDR_MAINFRAME);
-	// remove old menu
-	SetMenu(nullptr);
-
-	HWND hWndToolBar = CreateSimpleToolBarCtrl(m_hWnd, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
-
+	ToolBarButtonInfo const buttons[] = {
+		{ ID_VIEW_REFRESH, IDI_REFRESH },
+	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
-	AddSimpleReBarBand(hWndCmdBar);
-	AddSimpleReBarBand(hWndToolBar, nullptr, TRUE);
+	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
+	AddSimpleReBarBand(tb);
+	UIAddToolBar(tb);
 
 	CreateSimpleStatusBar();
 
-	m_hWndClient = m_view.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
+	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
 
-	UIAddToolBar(hWndToolBar);
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 4, 4);
+	UINT ids[] = { IDR_MAINFRAME };
+	for (auto id : ids)
+		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
+	m_Tabs.SetImageList(images);
+
 	UISetCheck(ID_VIEW_TOOLBAR, 1);
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
@@ -53,8 +53,13 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	pLoop->AddMessageFilter(this);
 	pLoop->AddIdleHandler(this);
 
-	CMenuHandle menuMain = m_CmdBar.GetMenu();
-	m_view.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+	CMenuHandle menuMain = GetMenu();
+	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+
+	UIAddMenu(menuMain);
+	AddMenu(menuMain);
+
+	PostMessage(WM_COMMAND, ID_FILE_NEW);
 
 	return 0;
 }
@@ -76,9 +81,9 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 }
 
 LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	CView* pView = new CView;
-	pView->Create(m_view, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_view.AddPage(pView->m_hWnd, _T("Document"));
+	auto pView = new CProgramsView(this);
+	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	m_Tabs.AddPage(pView->m_hWnd, _T("Programs"), 0);
 
 	// TODO: add code to initialize document
 
@@ -111,9 +116,9 @@ LRESULT CMainFrame::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 }
 
 LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	int nActivePage = m_view.GetActivePage();
+	int nActivePage = m_Tabs.GetActivePage();
 	if (nActivePage != -1)
-		m_view.RemovePage(nActivePage);
+		m_Tabs.RemovePage(nActivePage);
 	else
 		::MessageBeep((UINT)-1);
 
@@ -121,14 +126,14 @@ LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 }
 
 LRESULT CMainFrame::OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
-	m_view.RemoveAllPages();
+	m_Tabs.RemoveAllPages();
 
 	return 0;
 }
 
 LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nPage = wID - ID_WINDOW_TABFIRST;
-	m_view.SetActivePage(nPage);
+	m_Tabs.SetActivePage(nPage);
 
 	return 0;
 }
