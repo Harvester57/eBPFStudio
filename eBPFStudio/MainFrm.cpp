@@ -24,6 +24,22 @@ BOOL CMainFrame::OnIdle() {
 	return FALSE;
 }
 
+void CMainFrame::InitMenu() {
+	struct {
+		UINT id, icon;
+		HICON hIcon = nullptr;
+	} cmds[] = {
+		{ ID_VIEW_REFRESH, IDI_REFRESH },
+	};
+
+	for (auto& cmd : cmds) {
+		if (cmd.icon)
+			AddCommand(cmd.id, cmd.icon);
+		else
+			AddCommand(cmd.id, cmd.hIcon);
+	}
+}
+
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	ToolBarButtonInfo const buttons[] = {
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
@@ -56,6 +72,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	CMenuHandle menuMain = GetMenu();
 	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
 
+	InitMenu();
 	UIAddMenu(menuMain);
 	AddMenu(menuMain);
 
@@ -83,9 +100,7 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	auto pView = new CProgramsView(this);
 	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_Tabs.AddPage(pView->m_hWnd, _T("Programs"), 0);
-
-	// TODO: add code to initialize document
+	m_Tabs.AddPage(pView->m_hWnd, _T("Programs"), 0, pView);
 
 	return 0;
 }

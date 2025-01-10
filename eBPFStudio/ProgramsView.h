@@ -25,6 +25,8 @@ public:
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CVirtualListView<CProgramsView>)
 		CHAIN_MSG_MAP(BaseFrame)
+	ALT_MSG_MAP(1)
+		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -34,10 +36,11 @@ public:
 
 protected:
 	enum class ColumnType {
-		Name, Id, LinkCount, MapCount, GuidType, Type,
+		Name, Id, LinkCount, MapCount, GuidType, Type, PinnedPathCount, 
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	void Refresh();
 

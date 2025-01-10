@@ -21,6 +21,7 @@ struct BpfProgram {
 	BpfProgramType Type;
     GUID UuidType;
     uint32_t MapCount;
+    uint32_t PinnedPathCount;
     std::vector<uint32_t> MapIds;
 };
 

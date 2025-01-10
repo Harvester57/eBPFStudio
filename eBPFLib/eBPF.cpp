@@ -29,6 +29,7 @@ std::vector<BpfProgram> BPF::EnumPrograms(bool includeMapInfo) {
         p.Type = (BpfProgramType)info.type;
         p.UuidType = info.type_uuid;
         p.MapCount = info.nr_map_ids;
+        p.PinnedPathCount = info.pinned_path_count;
 
         programs.push_back(std::move(p));
     }
