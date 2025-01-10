@@ -24,6 +24,7 @@ public:
 	BEGIN_MSG_MAP(CProgramsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CVirtualListView<CProgramsView>)
+		CHAIN_MSG_MAP(BaseFrame)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
