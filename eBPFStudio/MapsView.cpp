@@ -93,10 +93,15 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	cm->AddColumn(L"Key", LVCFMT_RIGHT, 130, ColumnType::Key);
 	cm->AddColumn(L"Key (Hex)", LVCFMT_LEFT, 200, ColumnType::KeyHex);
 	cm->AddColumn(L"Value", LVCFMT_RIGHT, 130, ColumnType::Value);
-	cm->AddColumn(L"Value (Hex)", LVCFMT_LEFT, 200, ColumnType::ValueHex);
+	cm->AddColumn(L"Value (Hex)", LVCFMT_LEFT, 360, ColumnType::ValueHex);
 
 	cm->DeleteColumn(0);
 
+	CFont font;
+	font.CreatePointFont(100, L"Consolas");
+	m_MapDataList.SetFont(font.Detach());
+
+	m_MapDataList.GetHeader().SetFont(m_MapList.GetFont());
 	Refresh();
 
 	return 0;

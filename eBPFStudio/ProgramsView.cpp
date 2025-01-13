@@ -21,6 +21,9 @@ CString CProgramsView::GetColumnText(HWND hWnd, int row, int column) const {
 		case ColumnType::MapCount: return std::to_wstring(p.MapCount).c_str();
 		case ColumnType::LinkCount: return std::to_wstring(p.LinkCount).c_str();
 		case ColumnType::PinnedPathCount: return std::to_wstring(p.PinnedPathCount).c_str();
+		case ColumnType::FileName: return CString(p.FileName.c_str());
+		case ColumnType::Section: return CString(p.Section.c_str());
+		case ColumnType::ExeType: return StringHelper::ExeutionTypeToString(p.ExecutionType);
 	}
 
 	return CString();
@@ -38,6 +41,9 @@ LRESULT CProgramsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Maps", LVCFMT_RIGHT, 60, ColumnType::MapCount);
 	cm->AddColumn(L"Links", LVCFMT_RIGHT, 60, ColumnType::LinkCount);
 	cm->AddColumn(L"Pinned Paths", LVCFMT_RIGHT, 80, ColumnType::PinnedPathCount);
+	cm->AddColumn(L"Filename", LVCFMT_LEFT, 140, ColumnType::FileName);
+	cm->AddColumn(L"Execution Type", LVCFMT_LEFT, 140, ColumnType::ExeType);
+	cm->AddColumn(L"Section", LVCFMT_LEFT, 140, ColumnType::Section);
 
 	Refresh();
 

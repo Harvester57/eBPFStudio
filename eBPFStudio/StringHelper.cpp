@@ -54,3 +54,13 @@ std::wstring StringHelper::BufferToHexString(void const* p, uint32_t size) {
         text += std::format(L"{:02X} ", *((uint8_t const*)p + i));
     return text;
 }
+
+PCWSTR StringHelper::ExeutionTypeToString(BpfExecutionType type) {
+    switch (type) {
+        case BpfExecutionType::Any: return L"Any";
+        case BpfExecutionType::JIT: return L"JIT";
+        case BpfExecutionType::Interpret: return L"Interpret";
+        case BpfExecutionType::Native: return L"Native";
+    }
+    return L"(Unknown)";
+}

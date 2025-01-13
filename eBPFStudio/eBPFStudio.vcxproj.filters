@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\Icons">
       <UniqueIdentifier>{921eed89-fe50-42e6-8676-eb2ec8472054}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{a35f7962-5822-4c71-83cf-70ae3f115411}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -27,9 +30,6 @@
     <ClCompile Include="MainFrm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProgramsView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AboutDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -37,7 +37,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MapsView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgramsView.cpp">
+      <Filter>Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -45,9 +48,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainFrm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProgramsView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AboutDlg.h">
@@ -63,7 +63,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MapsView.h">
-      <Filter>Header Files</Filter>
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgramsView.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

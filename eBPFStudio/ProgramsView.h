@@ -32,7 +32,7 @@ public:
 
 protected:
 	enum class ColumnType {
-		Name, Id, LinkCount, MapCount, GuidType, Type, PinnedPathCount, 
+		Name, Id, LinkCount, MapCount, GuidType, Type, PinnedPathCount, ExeType, Section, FileName,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
