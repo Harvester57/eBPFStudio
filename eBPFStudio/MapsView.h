@@ -18,6 +18,7 @@ public:
 	CString GetColumnTextMapData(int row, int column) const;
 	int GetRowImage(HWND hWnd, int row, int column) const;
 	void OnStateChanged(HWND hWnd, int from, int to, UINT oldState, UINT newState);
+	void DoSort(SortInfo const* si);
 
 	BEGIN_MSG_MAP(CMapsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "LinksView.h"
 #include "StringHelper.h"
+#include <SortHelper.h>
 #include "resource.h"
 
 CString CLinksView::GetColumnText(HWND hWnd, int row, int column) const {
@@ -15,6 +16,19 @@ CString CLinksView::GetColumnText(HWND hWnd, int row, int column) const {
 		case ColumnType::AttachTypeGuid: return StringHelper::GuidToString(link.AttachTypeUuid);
 	}
 	return L"";
+}
+
+void CLinksView::DoSort(SortInfo const* si) {
+	auto sort = [&](auto const& p1, auto const& p2) {
+		switch (static_cast<ColumnType>(GetColumnManager(m_List)->GetColumnTag(si->SortColumn))) {
+			case ColumnType::Id: return SortHelper::Sort(p1.Id, p2.Id, si->SortAscending);
+			case ColumnType::ProgramId: return SortHelper::Sort(p1.ProgramId, p2.ProgramId, si->SortAscending);
+			case ColumnType::Type: return SortHelper::Sort(StringHelper::LinkTypeToString(p1.Type), StringHelper::LinkTypeToString(p2.Type), si->SortAscending);
+			case ColumnType::AttachType: return SortHelper::Sort(StringHelper::AttachTypeToString(p1.AttachType), StringHelper::AttachTypeToString(p2.AttachType), si->SortAscending);
+		}
+		return false;
+		};
+	std::ranges::sort(m_Links, sort);
 }
 
 int CLinksView::GetRowImage(HWND, int row, int) const {

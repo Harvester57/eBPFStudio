@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "MapsView.h"
 #include "StringHelper.h"
-#include <format>
+#include <SortHelper.h>
 #include "resource.h"
 
 CString CMapsView::GetColumnText(HWND hWnd, int row, int column) const {
@@ -57,6 +57,24 @@ void CMapsView::UpdateMapData(int row) {
 	m_MapDataList.SetItemCount((int)m_MapData.size());
 }
 
+void CMapsView::DoSort(SortInfo const* si) {
+	auto sort = [&](auto const& p1, auto const& p2) {
+		switch (static_cast<ColumnType>(GetColumnManager(m_MapList)->GetColumnTag(si->SortColumn))) {
+			case ColumnType::Name: return SortHelper::Sort(p1.Name, p2.Name, si->SortAscending);
+			case ColumnType::Id: return SortHelper::Sort(p1.Id, p2.Id, si->SortAscending);
+			case ColumnType::KeySize: return SortHelper::Sort(p1.KeySize, p2.KeySize, si->SortAscending);
+			case ColumnType::ValueSize: return SortHelper::Sort(p1.ValueSize, p2.ValueSize, si->SortAscending);
+			case ColumnType::MaxEntries: return SortHelper::Sort(p1.MaxEntries, p2.MaxEntries, si->SortAscending);
+			case ColumnType::PinnedPathCount: return SortHelper::Sort(p1.PinnedPathCount, p2.PinnedPathCount, si->SortAscending);
+			case ColumnType::Type: return SortHelper::Sort(StringHelper::MapTypeToString(p1.Type), StringHelper::MapTypeToString(p2.Type), si->SortAscending);
+			case ColumnType::Flags: return SortHelper::Sort(p1.Flags, p2.Flags, si->SortAscending);
+		}
+		return false;
+		};
+
+	std::ranges::sort(m_Maps, sort);
+}
+
 LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_hWndClient = m_Splitter.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
 	m_MapList.Create(m_Splitter, rcDefault, nullptr,
@@ -64,7 +82,7 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_MapList.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	m_MapDataList.Create(m_Splitter, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
+		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER);
 	m_MapDataList.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	CImageList images;

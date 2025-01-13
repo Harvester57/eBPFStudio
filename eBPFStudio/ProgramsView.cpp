@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "ProgramsView.h"
 #include "StringHelper.h"
+#include <SortHelper.h>
 
 BOOL CProgramsView::PreTranslateMessage(MSG* pMsg) {
 	pMsg;
@@ -33,6 +34,22 @@ CString CProgramsView::GetColumnText(HWND hWnd, int row, int column) const {
 
 int CProgramsView::GetRowImage(HWND, int row, int) const {
 	return 0;
+}
+
+void CProgramsView::DoSort(SortInfo const* si) {
+	auto sort = [&](auto const& p1, auto const& p2) {
+		switch (static_cast<ColumnType>(GetColumnManager(m_List)->GetColumnTag(si->SortColumn))) {
+			case ColumnType::Name: return SortHelper::Sort(p1.Name, p2.Name, si->SortAscending);
+			case ColumnType::Id: return SortHelper::Sort(p1.Id, p2.Id, si->SortAscending);
+			case ColumnType::FileName: return SortHelper::Sort(p1.FileName, p2.FileName, si->SortAscending);
+			case ColumnType::Section: return SortHelper::Sort(p1.Section, p2.Section, si->SortAscending);
+			case ColumnType::MapCount: return SortHelper::Sort(p1.MapCount, p2.MapCount, si->SortAscending);
+			case ColumnType::LinkCount: return SortHelper::Sort(p1.LinkCount, p2.LinkCount, si->SortAscending);
+			case ColumnType::Type: return SortHelper::Sort(StringHelper::ProgramTypeToString(p1.Type), StringHelper::ProgramTypeToString(p2.Type), si->SortAscending);
+		}
+		return false;
+		};
+	std::ranges::sort(m_Programs, sort);
 }
 
 LRESULT CProgramsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {

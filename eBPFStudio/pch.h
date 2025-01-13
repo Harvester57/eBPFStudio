@@ -24,6 +24,9 @@ extern CAppModule _Module;
 #include <vector>
 #include <strsafe.h>
 #include <format>
+#include <ranges>
+#include <algorithm>
+
 #include <dontuse.h>
 
 #if defined _M_IX86

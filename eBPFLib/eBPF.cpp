@@ -42,17 +42,17 @@ std::unique_ptr<BpfProgram> BpfSystem::GetProgramById(uint32_t id) {
 
 	bpf_prog_info info{};
 	uint32_t size = sizeof(info);
+	auto p = std::make_unique<BpfProgram>();
+	info.nr_map_ids = 32;
+	p->MapIds.resize(info.nr_map_ids);
+	info.map_ids = (uintptr_t)p->MapIds.data();
 	auto err = bpf_obj_get_info_by_fd(fd, &info, &size);
 	if (err) {
 		LocalClose(fd);
 		return nullptr;
 	}
 
-	auto p = std::make_unique<BpfProgram>();
 	p->MapIds.resize(info.nr_map_ids);
-	info.map_ids = (uintptr_t)p->MapIds.data();
-	err = bpf_obj_get_info_by_fd(fd, &info, &size);
-
 	p->Id = info.id;
 	p->Name = info.name;
 	p->LinkCount = info.link_count;

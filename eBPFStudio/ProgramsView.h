@@ -17,6 +17,7 @@ public:
 
 	CString GetColumnText(HWND hWnd, int row, int column) const;
 	int GetRowImage(HWND, int row, int) const;
+	void DoSort(SortInfo const* si);
 
 	BEGIN_MSG_MAP(CProgramsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
