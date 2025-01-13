@@ -102,6 +102,12 @@ IDI_REFRESH             ICON                    "res\\refresh.ico"
 
 IDI_MAPS                ICON                    "res\\Database.ico"
 
+IDI_CPU                 ICON                    "res\\cpu.ico"
+
+IDI_SYSTEM              ICON                    "res\\System.ico"
+
+IDI_LINK                ICON                    "res\\link.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

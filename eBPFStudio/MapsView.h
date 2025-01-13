@@ -15,6 +15,9 @@ public:
 	DECLARE_WND_CLASS(nullptr)
 
 	CString GetColumnText(HWND hWnd, int row, int column) const;
+	CString GetColumnTextMapData(int row, int column) const;
+	int GetRowImage(HWND hWnd, int row, int column) const;
+	void OnStateChanged(HWND hWnd, int from, int to, UINT oldState, UINT newState);
 
 	BEGIN_MSG_MAP(CMapsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
@@ -30,8 +33,11 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 protected:
+	void UpdateMapData(int row);
+
 	enum class ColumnType {
-		Name, Id, KeySize, ValueSize, Type, PinnedPathCount, MaxEntries,
+		Name, Id, KeySize, ValueSize, Type, PinnedPathCount, MaxEntries, Flags,
+		Key, KeyHex, Value, ValueHex,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -41,6 +47,8 @@ protected:
 
 private:
 	CCustomHorSplitterWindow m_Splitter;
-	CListViewCtrl m_List;
+	CListViewCtrl m_MapList;
+	CListViewCtrl m_MapDataList;
 	std::vector<BpfMap> m_Maps;
+	std::vector<BpfMapItem> m_MapData;
 };

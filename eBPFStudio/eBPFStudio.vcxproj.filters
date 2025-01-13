@@ -81,5 +81,14 @@
     <Image Include="res\Database.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\cpu.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\System.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\link.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

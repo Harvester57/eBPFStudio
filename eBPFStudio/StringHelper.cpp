@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "StringHelper.h"
+#include <cassert>
+#include <format>
 
 PCWSTR StringHelper::ProgramTypeToString(BpfProgramType type) {
     switch (type) {
@@ -32,4 +34,23 @@ PCWSTR StringHelper::MapTypeToString(BpfMapType type) {
         case BpfMapType::RingBuffer: return L"Ring Buffer";
     }
     return L"(Unknown)";
+}
+
+std::wstring StringHelper::FormatNumber(void const* p, uint32_t size) {
+    assert(size <= 8);
+    switch (size) {
+        case 8: return std::format(L"0x{:X}", *(uint64_t*)p);
+        case 4: return std::format(L"0x{:X}", *(uint32_t*)p);
+        case 2: return std::format(L"0x{:X}", *(uint16_t*)p);
+        case 1: return std::format(L"0x{:X}", *(uint64_t*)p);
+    }
+
+    return L"";
+}
+
+std::wstring StringHelper::BufferToHexString(void const* p, uint32_t size) {
+    std::wstring text;
+    for (uint32_t i = 0; i < size; i++)
+        text += std::format(L"{:02X} ", *((uint8_t const*)p + i));
+    return text;
 }

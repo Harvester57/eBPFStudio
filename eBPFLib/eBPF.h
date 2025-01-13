@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <guiddef.h>
 
 enum class BpfProgramType {
@@ -14,6 +15,26 @@ enum class BpfProgramType {
     Sample = 999,
 };
 
+enum class BpfExecutionType {
+    Any,       
+    JIT,       
+    Interpret, 
+    Native     
+};
+
+enum class BpfAttachType {
+    Unspecified, 
+    Xdp,
+    Bind,
+    CGroupInet4Connect,
+    CGroupInet6Connect,
+    CGroupInet4RecvAccept,
+    CGroupInet6RecvAccept,
+    CGroupSockOps,
+    Sample,
+    XdpTest,
+};
+
 struct BpfProgram {
 	std::string Name;
 	int Id;
@@ -22,6 +43,9 @@ struct BpfProgram {
     GUID UuidType;
     uint32_t MapCount;
     uint32_t PinnedPathCount;
+    BpfExecutionType ExecutionType;
+    std::string FileName;
+    std::string Section;
     std::vector<uint32_t> MapIds;
 };
 
@@ -54,11 +78,47 @@ struct BpfMap {
     // Windows-specific fields.
     uint32_t InnerMapId;
     uint32_t PinnedPathCount; 
+
+    bool IsPerCpu() const;
+};
+
+enum class BpfLinkType {
+    Unspecified,
+    Plain,  
+    CGroup, 
+    Xdp,
+    Max
+};
+
+struct BpfLink {
+    uint32_t Id;
+    uint32_t ProgramId;
+    BpfLinkType Type;
+    BpfAttachType AttachType;
+    GUID AttachTypeUuid;
+    GUID ProgramTypeUuid;
+    union {
+        struct {
+            uint32_t Ifindex;
+        };
+        struct {
+            uint64_t CGroupId;
+        };
+        uint8_t AttachData;
+    };
+};
+
+struct BpfMapItem {
+    uint32_t Index;
+    std::unique_ptr<uint8_t[]> Key;
+    std::unique_ptr<uint8_t[]> Value;
 };
 
 class BPF {
 public:
 	static std::vector<BpfProgram> EnumPrograms();
     static std::vector<BpfMap> EnumMaps();
+    static std::vector<BpfLink> EnumLinks();
+    static std::vector<BpfMapItem> GetMapData(uint32_t id);
 };
 

@@ -57,7 +57,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 4, 4);
-	UINT ids[] = { IDR_MAINFRAME, IDI_MAPS };
+	UINT ids[] = { 
+		IDR_MAINFRAME, IDI_MAPS, IDI_LINK 
+	};
 	for (auto id : ids)
 		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
 	m_Tabs.SetImageList(images);
@@ -110,6 +112,8 @@ LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 		m_Tabs.AddPage(view->m_hWnd, L"Maps", 1);
 	}
+
+	m_Tabs.SetActivePage(0);
 
 	return 0;
 }
