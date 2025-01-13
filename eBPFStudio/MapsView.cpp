@@ -53,7 +53,7 @@ void CMapsView::OnStateChanged(HWND hWnd, int from, int to, UINT oldState, UINT 
 void CMapsView::UpdateMapData(int row) {
 	auto& map = m_Maps[row];
 
-	m_MapData = BPF::GetMapData(map.Id);
+	m_MapData = BpfSystem::GetMapData(map.Id);
 	m_MapDataList.SetItemCount((int)m_MapData.size());
 }
 
@@ -113,7 +113,7 @@ LRESULT CMapsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 void CMapsView::Refresh() {
-	m_Maps = BPF::EnumMaps();
+	m_Maps = BpfSystem::EnumMaps();
 
 	m_MapList.SetItemCount((int)m_Maps.size());
 }

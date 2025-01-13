@@ -64,3 +64,35 @@ PCWSTR StringHelper::ExeutionTypeToString(BpfExecutionType type) {
     }
     return L"(Unknown)";
 }
+
+PCWSTR StringHelper::LinkTypeToString(BpfLinkType type) {
+    switch (type) {
+        case BpfLinkType::Unspecified: return L"Unspecified";
+        case BpfLinkType::Plain: return L"Plain";
+        case BpfLinkType::Xdp: return L"XDP";
+        case BpfLinkType::CGroup: return L"CGroup";
+    }
+    return L"(Unknown)";
+}
+
+PCWSTR StringHelper::AttachTypeToString(BpfAttachType type) {
+    switch (type) {
+        case BpfAttachType::Xdp: return L"XDP";
+        case BpfAttachType::Unspecified: return L"Unspecified";
+        case BpfAttachType::CGroupInet4Connect: return L"CGroup Inet4 Connect";
+        case BpfAttachType::CGroupInet6Connect: return L"CGroup Inet6 Connect";
+        case BpfAttachType::CGroupInet4RecvAccept: return L"CGroup Inet4 Recv Accept";
+        case BpfAttachType::CGroupInet6RecvAccept: return L"CGroup Inet6 Recv Accept";
+        case BpfAttachType::CGroupSockOps: return L"CGroup Socket Ops";
+        case BpfAttachType::XdpTest: return L"XDP Test";
+        case BpfAttachType::Bind: return L"Bind";
+        case BpfAttachType::Sample: return L"Sample";
+    }
+    return L"(Unknown)";
+}
+
+CString StringHelper::GuidToString(GUID const& guid) {
+    WCHAR text[64];
+    ::StringFromGUID2(guid, text, _countof(text));
+    return text;
+}

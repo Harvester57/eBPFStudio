@@ -114,9 +114,10 @@ struct BpfMapItem {
     std::unique_ptr<uint8_t[]> Value;
 };
 
-class BPF {
+class BpfSystem {
 public:
 	static std::vector<BpfProgram> EnumPrograms();
+    static std::unique_ptr<BpfProgram> GetProgramById(uint32_t id);
     static std::vector<BpfMap> EnumMaps();
     static std::vector<BpfLink> EnumLinks();
     static std::vector<BpfMapItem> GetMapData(uint32_t id);

@@ -10,6 +10,7 @@
 #include <ToolbarHelper.h>
 #include "ProgramsView.h"
 #include "MapsView.h"
+#include "LinksView.h"
 
 #define WINDOW_MENU_POSITION	4
 
@@ -111,6 +112,11 @@ LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		auto view = new CMapsView(this);
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 		m_Tabs.AddPage(view->m_hWnd, L"Maps", 1);
+	}
+	{
+		auto view = new CLinksView(this);
+		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+		m_Tabs.AddPage(view->m_hWnd, L"Links", 2);
 	}
 
 	m_Tabs.SetActivePage(0);

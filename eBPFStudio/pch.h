@@ -23,6 +23,7 @@ extern CAppModule _Module;
 #include <string>
 #include <vector>
 #include <strsafe.h>
+#include <format>
 #include <dontuse.h>
 
 #if defined _M_IX86

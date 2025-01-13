@@ -24,6 +24,7 @@ CString CProgramsView::GetColumnText(HWND hWnd, int row, int column) const {
 		case ColumnType::FileName: return CString(p.FileName.c_str());
 		case ColumnType::Section: return CString(p.Section.c_str());
 		case ColumnType::ExeType: return StringHelper::ExeutionTypeToString(p.ExecutionType);
+		case ColumnType::GuidType: return StringHelper::GuidToString(p.UuidType);
 	}
 
 	return CString();
@@ -44,6 +45,7 @@ LRESULT CProgramsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	cm->AddColumn(L"Filename", LVCFMT_LEFT, 140, ColumnType::FileName);
 	cm->AddColumn(L"Execution Type", LVCFMT_LEFT, 140, ColumnType::ExeType);
 	cm->AddColumn(L"Section", LVCFMT_LEFT, 140, ColumnType::Section);
+	cm->AddColumn(L"Type GUID", LVCFMT_LEFT, 200, ColumnType::GuidType);
 
 	Refresh();
 
@@ -57,6 +59,6 @@ LRESULT CProgramsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 }
 
 void CProgramsView::Refresh() {
-	m_Programs = BPF::EnumPrograms();
+	m_Programs = BpfSystem::EnumPrograms();
 	m_List.SetItemCount((int)m_Programs.size());
 }

@@ -6,15 +6,10 @@
 extern "C" int __cdecl _free_osfhnd(int const fh);
 
 bool LocalClose(int fd) {
-#ifdef _DEBUG
-    return 0 == _close(fd);
-#else
-    // BUG: this fails in release build (_close crashes)
     return _free_osfhnd(fd);
-#endif
 }
 
-std::vector<BpfProgram> BPF::EnumPrograms() {
+std::vector<BpfProgram> BpfSystem::EnumPrograms() {
     uint32_t id = 0;
     std::vector<BpfProgram> programs;
     programs.reserve(8);
@@ -24,44 +19,52 @@ std::vector<BpfProgram> BPF::EnumPrograms() {
         if (err)
             break;
 
-        auto fd = bpf_prog_get_fd_by_id(id);
-        if (fd < 0)
+        auto p = GetProgramById(id);
+        if (!p)
             break;
 
-        bpf_prog_info info{};
-        uint32_t size = sizeof(info);
-        err = bpf_obj_get_info_by_fd(fd, &info, &size);
-
-        ebpf_execution_type_t type;
-        const char* filename, * section;
-        err = ebpf_program_query_info(fd, &type, &filename, &section);
-        LocalClose(fd);
-
-        if (err)
-            break;
-
-        BpfProgram p;
-        p.Id = info.id;
-        p.Name = info.name;
-        p.LinkCount = info.link_count;
-        p.Type = (BpfProgramType)info.type;
-        p.UuidType = info.type_uuid;
-        p.MapCount = info.nr_map_ids;
-        p.PinnedPathCount = info.pinned_path_count;
-        if (err == 0) {
-            p.ExecutionType = (BpfExecutionType)type;
-            p.Section = section;
-            p.FileName = filename;
-        }
-        ebpf_free_string(filename);
-        ebpf_free_string(section);
-
-        programs.push_back(std::move(p));
+        programs.push_back(std::move(*p));
     }
     return programs;
 }
 
-std::vector<BpfMap> BPF::EnumMaps() {
+std::unique_ptr<BpfProgram> BpfSystem::GetProgramById(uint32_t id) {
+    auto fd = bpf_prog_get_fd_by_id(id);
+    if (fd < 0)
+        return nullptr;
+
+    bpf_prog_info info{};
+    uint32_t size = sizeof(info);
+    auto err = bpf_obj_get_info_by_fd(fd, &info, &size);
+
+    ebpf_execution_type_t type;
+    const char* filename, * section;
+    err = ebpf_program_query_info(fd, &type, &filename, &section);
+    LocalClose(fd);
+
+    if (err)
+        return nullptr;
+
+    auto p = std::make_unique<BpfProgram>();
+    p->Id = info.id;
+    p->Name = info.name;
+    p->LinkCount = info.link_count;
+    p->Type = (BpfProgramType)info.type;
+    p->UuidType = info.type_uuid;
+    p->MapCount = info.nr_map_ids;
+    p->PinnedPathCount = info.pinned_path_count;
+    if (err == 0) {
+        p->ExecutionType = (BpfExecutionType)type;
+        p->Section = section;
+        p->FileName = filename;
+    }
+    ebpf_free_string(filename);
+    ebpf_free_string(section);
+    
+    return p;
+}
+
+std::vector<BpfMap> BpfSystem::EnumMaps() {
     uint32_t id = 0;
     std::vector<BpfMap> maps;
     maps.reserve(8);
@@ -98,7 +101,7 @@ std::vector<BpfMap> BPF::EnumMaps() {
     return maps;
 }
 
-std::vector<BpfLink> BPF::EnumLinks() {
+std::vector<BpfLink> BpfSystem::EnumLinks() {
     uint32_t id = 0;
     std::vector<BpfLink> links;
     links.reserve(8);
@@ -130,7 +133,7 @@ std::vector<BpfLink> BPF::EnumLinks() {
     return links;
 }
 
-std::vector<BpfMapItem> BPF::GetMapData(uint32_t id) {
+std::vector<BpfMapItem> BpfSystem::GetMapData(uint32_t id) {
     auto fd = bpf_map_get_fd_by_id(id);
     if (fd < 0)
         return {};

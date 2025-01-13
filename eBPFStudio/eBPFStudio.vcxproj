@@ -225,6 +225,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="eBPFStudio.cpp" />
+    <ClCompile Include="LinksView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MapsView.cpp" />
     <ClCompile Include="pch.cpp">
@@ -239,6 +240,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="IMainFrame.h" />
+    <ClInclude Include="LinksView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MapsView.h" />
     <ClInclude Include="resource.h" />

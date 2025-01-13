@@ -42,6 +42,9 @@
     <ClCompile Include="ProgramsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="LinksView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -66,6 +69,9 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="ProgramsView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="LinksView.h">
       <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
