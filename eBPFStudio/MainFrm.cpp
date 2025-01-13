@@ -106,17 +106,17 @@ LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 	{
 		auto view = new CProgramsView(this);
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-		m_Tabs.AddPage(view->m_hWnd, L"Programs", 0);
+		m_Tabs.AddPage(view->m_hWnd, L"Programs", 0, view);
 	}
 	{
 		auto view = new CMapsView(this);
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-		m_Tabs.AddPage(view->m_hWnd, L"Maps", 1);
+		m_Tabs.AddPage(view->m_hWnd, L"Maps", 1, view);
 	}
 	{
 		auto view = new CLinksView(this);
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-		m_Tabs.AddPage(view->m_hWnd, L"Links", 2);
+		m_Tabs.AddPage(view->m_hWnd, L"Links", 2, view);
 	}
 
 	m_Tabs.SetActivePage(0);

@@ -11,5 +11,12 @@ struct StringHelper abstract final{
 	static PCWSTR LinkTypeToString(BpfLinkType type);
 	static PCWSTR AttachTypeToString(BpfAttachType type);
 	static CString GuidToString(GUID const& guid);
+	template<typename T>
+	static CString VectorToString(std::vector<T> const& values) {
+		CString result;
+		for (auto& v : values)
+			result += std::format(L"{}, ", v).c_str();
+		return result.IsEmpty() ? result : result.Left(result.GetLength() - 2);
+	}
 };
 

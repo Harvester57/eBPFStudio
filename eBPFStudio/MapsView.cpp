@@ -60,7 +60,7 @@ void CMapsView::UpdateMapData(int row) {
 LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_hWndClient = m_Splitter.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
 	m_MapList.Create(m_Splitter, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
+		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL);
 	m_MapList.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	m_MapDataList.Create(m_Splitter, rcDefault, nullptr,

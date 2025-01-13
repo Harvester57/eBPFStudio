@@ -14,6 +14,7 @@ public:
 	DECLARE_WND_CLASS(nullptr)
 
 	CString GetColumnText(HWND hWnd, int row, int column) const;
+	int GetRowImage(HWND, int row, int) const;
 
 	BEGIN_MSG_MAP(CLinksView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)

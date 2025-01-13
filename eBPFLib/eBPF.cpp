@@ -6,171 +6,184 @@
 extern "C" int __cdecl _free_osfhnd(int const fh);
 
 bool LocalClose(int fd) {
-    return _free_osfhnd(fd);
+	__try {
+		_close(fd);
+		return true;
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		//return _free_osfhnd(fd);
+		return false;
+	}
 }
 
 std::vector<BpfProgram> BpfSystem::EnumPrograms() {
-    uint32_t id = 0;
-    std::vector<BpfProgram> programs;
-    programs.reserve(8);
+	uint32_t id = 0;
+	std::vector<BpfProgram> programs;
+	programs.reserve(8);
 
-    for (;;) {
-        auto err = bpf_prog_get_next_id(id, &id);
-        if (err)
-            break;
+	for (;;) {
+		auto err = bpf_prog_get_next_id(id, &id);
+		if (err)
+			break;
 
-        auto p = GetProgramById(id);
-        if (!p)
-            break;
+		auto p = GetProgramById(id);
+		if (!p)
+			break;
 
-        programs.push_back(std::move(*p));
-    }
-    return programs;
+		programs.push_back(std::move(*p));
+	}
+	return programs;
 }
 
 std::unique_ptr<BpfProgram> BpfSystem::GetProgramById(uint32_t id) {
-    auto fd = bpf_prog_get_fd_by_id(id);
-    if (fd < 0)
-        return nullptr;
+	auto fd = bpf_prog_get_fd_by_id(id);
+	if (fd < 0)
+		return nullptr;
 
-    bpf_prog_info info{};
-    uint32_t size = sizeof(info);
-    auto err = bpf_obj_get_info_by_fd(fd, &info, &size);
+	bpf_prog_info info{};
+	uint32_t size = sizeof(info);
+	auto err = bpf_obj_get_info_by_fd(fd, &info, &size);
+	if (err) {
+		LocalClose(fd);
+		return nullptr;
+	}
 
-    ebpf_execution_type_t type;
-    const char* filename, * section;
-    err = ebpf_program_query_info(fd, &type, &filename, &section);
-    LocalClose(fd);
+	auto p = std::make_unique<BpfProgram>();
+	p->MapIds.resize(info.nr_map_ids);
+	info.map_ids = (uintptr_t)p->MapIds.data();
+	err = bpf_obj_get_info_by_fd(fd, &info, &size);
 
-    if (err)
-        return nullptr;
+	p->Id = info.id;
+	p->Name = info.name;
+	p->LinkCount = info.link_count;
+	p->Type = (BpfProgramType)info.type;
+	p->UuidType = info.type_uuid;
+	p->MapCount = info.nr_map_ids;
+	p->PinnedPathCount = info.pinned_path_count;
 
-    auto p = std::make_unique<BpfProgram>();
-    p->Id = info.id;
-    p->Name = info.name;
-    p->LinkCount = info.link_count;
-    p->Type = (BpfProgramType)info.type;
-    p->UuidType = info.type_uuid;
-    p->MapCount = info.nr_map_ids;
-    p->PinnedPathCount = info.pinned_path_count;
-    if (err == 0) {
-        p->ExecutionType = (BpfExecutionType)type;
-        p->Section = section;
-        p->FileName = filename;
-    }
-    ebpf_free_string(filename);
-    ebpf_free_string(section);
-    
-    return p;
+	ebpf_execution_type_t type;
+	const char* filename, * section;
+	err = ebpf_program_query_info(fd, &type, &filename, &section);
+	LocalClose(fd);
+
+	if (err == 0) {
+		p->ExecutionType = (BpfExecutionType)type;
+		p->Section = section;
+		p->FileName = filename;
+	}
+	ebpf_free_string(filename);
+	ebpf_free_string(section);
+
+	return p;
 }
 
 std::vector<BpfMap> BpfSystem::EnumMaps() {
-    uint32_t id = 0;
-    std::vector<BpfMap> maps;
-    maps.reserve(8);
-    for (;;) {
-        auto err = bpf_map_get_next_id(id, &id);
-        if (err)
-            break;
+	uint32_t id = 0;
+	std::vector<BpfMap> maps;
+	maps.reserve(8);
+	for (;;) {
+		auto err = bpf_map_get_next_id(id, &id);
+		if (err)
+			break;
 
-        auto fd = bpf_map_get_fd_by_id(id);
-        if (fd < 0)
-            break;
+		auto fd = bpf_map_get_fd_by_id(id);
+		if (fd < 0)
+			break;
 
-        bpf_map_info info{};
-        uint32_t size = sizeof(info);
-        err = bpf_obj_get_info_by_fd(fd, &info, &size);
-        LocalClose(fd);
+		bpf_map_info info{};
+		uint32_t size = sizeof(info);
+		err = bpf_obj_get_info_by_fd(fd, &info, &size);
+		LocalClose(fd);
 
-        if (err)
-            break;
+		if (err)
+			break;
 
-        BpfMap map;
-        map.Name = info.name;
-        map.Id = info.id;
-        map.InnerMapId = info.inner_map_id;
-        map.Flags = info.map_flags;
-        map.Type = (BpfMapType)info.type;
-        map.KeySize = info.key_size;
-        map.ValueSize = info.value_size;
-        map.MaxEntries = info.max_entries;
-        map.PinnedPathCount = info.pinned_path_count;
+		BpfMap map;
+		map.Name = info.name;
+		map.Id = info.id;
+		map.InnerMapId = info.inner_map_id;
+		map.Flags = info.map_flags;
+		map.Type = (BpfMapType)info.type;
+		map.KeySize = info.key_size;
+		map.ValueSize = info.value_size;
+		map.MaxEntries = info.max_entries;
+		map.PinnedPathCount = info.pinned_path_count;
 
-        maps.push_back(std::move(map));
-    }
-    return maps;
+		maps.push_back(std::move(map));
+	}
+	return maps;
 }
 
 std::vector<BpfLink> BpfSystem::EnumLinks() {
-    uint32_t id = 0;
-    std::vector<BpfLink> links;
-    links.reserve(8);
+	uint32_t id = 0;
+	std::vector<BpfLink> links;
+	links.reserve(8);
 
-    for (;;) {
-        auto err = bpf_link_get_next_id(id, &id);
-        if (err) break;
+	for (;;) {
+		auto err = bpf_link_get_next_id(id, &id);
+		if (err) break;
 
-        auto fd = bpf_link_get_fd_by_id(id);
-        if (fd < 0) break;
+		auto fd = bpf_link_get_fd_by_id(id);
+		if (fd < 0) break;
 
-        bpf_link_info info{};
-        uint32_t size = sizeof(info);
-        err = bpf_obj_get_info_by_fd(fd, &info, &size);
-        LocalClose(fd);
-        if (err) break;
+		bpf_link_info info{};
+		uint32_t size = sizeof(info);
+		err = bpf_obj_get_info_by_fd(fd, &info, &size);
+		LocalClose(fd);
+		if (err) break;
 
-        BpfLink link;
-        link.Id = info.id;
-        link.Type = (BpfLinkType)info.type;
-        link.CGroupId = info.cgroup.cgroup_id;
-        link.AttachType = (BpfAttachType)info.attach_type;
-        link.ProgramId = info.prog_id;
-        link.ProgramTypeUuid = info.program_type_uuid;
-        link.AttachTypeUuid = info.attach_type_uuid;
-        
-        links.push_back(std::move(link));
-    }
-    return links;
+		BpfLink link;
+		link.Id = info.id;
+		link.Type = (BpfLinkType)info.type;
+		link.CGroupId = info.cgroup.cgroup_id;
+		link.AttachType = (BpfAttachType)info.attach_type;
+		link.ProgramId = info.prog_id;
+		link.ProgramTypeUuid = info.program_type_uuid;
+		link.AttachTypeUuid = info.attach_type_uuid;
+
+		links.push_back(std::move(link));
+	}
+	return links;
 }
 
 std::vector<BpfMapItem> BpfSystem::GetMapData(uint32_t id) {
-    auto fd = bpf_map_get_fd_by_id(id);
-    if (fd < 0)
-        return {};
-    
-    bpf_map_info info{};
-    uint32_t size = sizeof(info);
-    auto err = bpf_obj_get_info_by_fd(fd, &info, &size);
-    if (err)
-        return {};
+	auto fd = bpf_map_get_fd_by_id(id);
+	if (fd < 0)
+		return {};
 
-    void const* keystart = nullptr;
-    std::vector<BpfMapItem> data;
-    data.reserve(info.max_entries);
-    auto key = std::vector<uint8_t>(info.key_size);
-    auto value = std::vector<uint8_t>(info.value_size);
+	bpf_map_info info{};
+	uint32_t size = sizeof(info);
+	auto err = bpf_obj_get_info_by_fd(fd, &info, &size);
+	if (err)
+		return {};
 
-    uint32_t index = 0;
-    for (;;) {
-        err = bpf_map_get_next_key(fd, keystart, key.data());
-        if (err)
-            break;
+	void const* keystart = nullptr;
+	std::vector<BpfMapItem> data;
+	data.reserve(info.max_entries);
+	auto key = std::vector<uint8_t>(info.key_size);
+	auto value = std::vector<uint8_t>(info.value_size);
 
-        err = bpf_map_lookup_elem(fd, key.data(), value.data());
-        if (err)
-            break;
+	uint32_t index = 0;
+	for (;;) {
+		err = bpf_map_get_next_key(fd, keystart, key.data());
+		if (err)
+			break;
 
-        keystart = key.data();
-        BpfMapItem item{ index++, std::make_unique<uint8_t[]>(info.key_size), std::make_unique<uint8_t[]>(info.value_size) };
-        memcpy(item.Key.get(), key.data(), key.size());
-        memcpy(item.Value.get(), value.data(), value.size());
-        data.push_back(std::move(item));
-    }
+		err = bpf_map_lookup_elem(fd, key.data(), value.data());
+		if (err)
+			break;
 
-    LocalClose(fd);
-    return data;
+		keystart = key.data();
+		BpfMapItem item{ index++, std::make_unique<uint8_t[]>(info.key_size), std::make_unique<uint8_t[]>(info.value_size) };
+		memcpy(item.Key.get(), key.data(), key.size());
+		memcpy(item.Value.get(), value.data(), value.size());
+		data.push_back(std::move(item));
+	}
+
+	LocalClose(fd);
+	return data;
 }
 
 bool BpfMap::IsPerCpu() const {
-    return Type == BpfMapType::LruPerCpuHash || Type == BpfMapType::PerCpuArray || Type == BpfMapType::PerCpuHash;
+	return Type == BpfMapType::LruPerCpuHash || Type == BpfMapType::PerCpuArray || Type == BpfMapType::PerCpuHash;
 }

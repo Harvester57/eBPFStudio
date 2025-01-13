@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "LinksView.h"
 #include "StringHelper.h"
+#include "resource.h"
 
 CString CLinksView::GetColumnText(HWND hWnd, int row, int column) const {
 	auto& link = m_Links[row];
@@ -16,10 +17,21 @@ CString CLinksView::GetColumnText(HWND hWnd, int row, int column) const {
 	return L"";
 }
 
+int CLinksView::GetRowImage(HWND, int row, int) const {
+	return 0;
+}
+
 LRESULT CLinksView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
+
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
+	UINT ids[] = { IDI_LINK };
+	for (auto id : ids)
+		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
 
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"", 0, 0, 0);

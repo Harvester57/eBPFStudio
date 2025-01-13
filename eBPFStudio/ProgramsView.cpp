@@ -23,6 +23,7 @@ CString CProgramsView::GetColumnText(HWND hWnd, int row, int column) const {
 		case ColumnType::PinnedPathCount: return std::to_wstring(p.PinnedPathCount).c_str();
 		case ColumnType::FileName: return CString(p.FileName.c_str());
 		case ColumnType::Section: return CString(p.Section.c_str());
+		case ColumnType::MapIds: return StringHelper::VectorToString(p.MapIds);
 		case ColumnType::ExeType: return StringHelper::ExeutionTypeToString(p.ExecutionType);
 		case ColumnType::GuidType: return StringHelper::GuidToString(p.UuidType);
 	}
@@ -30,20 +31,32 @@ CString CProgramsView::GetColumnText(HWND hWnd, int row, int column) const {
 	return CString();
 }
 
+int CProgramsView::GetRowImage(HWND, int row, int) const {
+	return 0;
+}
+
 LRESULT CProgramsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_List.Create(m_hWnd, rcDefault, nullptr,
 		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT);
 	m_List.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
+	CImageList images;
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 2);
+	UINT ids[] = { IDR_MAINFRAME };
+	for (auto id : ids)
+		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
+	m_List.SetImageList(images, LVSIL_SMALL);
+
 	auto cm = GetColumnManager(m_List);
 	cm->AddColumn(L"Name", LVCFMT_LEFT, 140, ColumnType::Name);
 	cm->AddColumn(L"ID", LVCFMT_RIGHT, 60, ColumnType::Id);
-	cm->AddColumn(L"Type", LVCFMT_LEFT, 100, ColumnType::Type);
+	cm->AddColumn(L"Type", LVCFMT_LEFT, 130, ColumnType::Type);
 	cm->AddColumn(L"Maps", LVCFMT_RIGHT, 60, ColumnType::MapCount);
 	cm->AddColumn(L"Links", LVCFMT_RIGHT, 60, ColumnType::LinkCount);
 	cm->AddColumn(L"Pinned Paths", LVCFMT_RIGHT, 80, ColumnType::PinnedPathCount);
 	cm->AddColumn(L"Filename", LVCFMT_LEFT, 140, ColumnType::FileName);
 	cm->AddColumn(L"Execution Type", LVCFMT_LEFT, 140, ColumnType::ExeType);
+	cm->AddColumn(L"Map IDs", LVCFMT_LEFT, 120, ColumnType::MapIds);
 	cm->AddColumn(L"Section", LVCFMT_LEFT, 140, ColumnType::Section);
 	cm->AddColumn(L"Type GUID", LVCFMT_LEFT, 200, ColumnType::GuidType);
 

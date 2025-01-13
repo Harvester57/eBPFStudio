@@ -16,6 +16,7 @@ public:
 	BOOL PreTranslateMessage(MSG* pMsg);
 
 	CString GetColumnText(HWND hWnd, int row, int column) const;
+	int GetRowImage(HWND, int row, int) const;
 
 	BEGIN_MSG_MAP(CProgramsView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
@@ -32,7 +33,7 @@ public:
 
 protected:
 	enum class ColumnType {
-		Name, Id, LinkCount, MapCount, GuidType, Type, PinnedPathCount, ExeType, Section, FileName,
+		Name, Id, LinkCount, MapCount, GuidType, Type, PinnedPathCount, ExeType, Section, FileName, MapIds
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

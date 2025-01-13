@@ -4,19 +4,15 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
-#define IDI_ICON1                       201
 #define IDI_REFRESH                     201
 #define IDI_MAPS                        203
 #define IDI_CPU                         204
-#define IDI_ICON3                       205
 #define IDI_SYSTEM                      205
-#define IDI_ICON2                       206
 #define IDI_LINK                        206
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS                      32775
 #define ID_OPTIONS_ALWAYSONTOP          32776
-#define ID_VIEW_REFRESH32777            32777
 
 // Next default values for new objects
 // 
