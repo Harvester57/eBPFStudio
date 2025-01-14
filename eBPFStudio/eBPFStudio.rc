@@ -120,7 +120,7 @@ CAPTION "About eBPF Studio"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,68,60,50,14
-    CTEXT           "eBPF Studio v0.1",IDC_STATIC,51,30,78,18
+    CTEXT           "eBPF Studio v0.1\n\n©2025 Pavel Yosifovich",IDC_STATIC,46,23,94,26
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
 END
 
@@ -174,8 +174,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,0,0
+ PRODUCTVERSION 0,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -188,15 +188,15 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "eBPFStudio Module"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileDescription", "eBPF Studio"
+            VALUE "FileVersion", "0.1.0.0"
             VALUE "InternalName", "eBPFStudio"
-            VALUE "LegalCopyright", "Copyright 2025"
+            VALUE "LegalCopyright", "©2025 Pavel Yosifovich"
             VALUE "OriginalFilename", "eBPFStudio.exe"
-            VALUE "ProductName", "eBPFStudio Module"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductName", "eBPF Studio"
+            VALUE "ProductVersion", "0.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
