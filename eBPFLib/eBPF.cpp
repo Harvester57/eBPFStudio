@@ -1,19 +1,11 @@
 #include "pch.h"
 #include "eBPF.h"
-#include <bpf\bpf.h>
+#include <ebpf_api.h>
+#include <bpf/bpf.h>
 #include <io.h>
 
-extern "C" int __cdecl _free_osfhnd(int const fh);
-
 bool LocalClose(int fd) {
-	__try {
-		_close(fd);
-		return true;
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER) {
-		//return _free_osfhnd(fd);
-		return false;
-	}
+	return _close(fd) == 0;
 }
 
 std::vector<BpfProgram> BpfSystem::EnumPrograms() {
@@ -182,6 +174,50 @@ std::vector<BpfMapItem> BpfSystem::GetMapData(uint32_t id) {
 
 	LocalClose(fd);
 	return data;
+}
+
+std::vector<BpfProgramEx> BpfSystem::EnumProgramsInFile(const char* path, std::string* errMsg) {
+	ebpf_api_program_info_t* info;
+	const char* msg;
+	if (ebpf_enumerate_programs(path, true, &info, &msg) < 0) {
+		if (errMsg)
+			*errMsg = msg;
+		return {};
+	}
+
+	std::vector<BpfProgramEx> programs;
+	auto start = info;
+	while (info) {
+		BpfProgramEx p;
+		p.FileName = path;
+		p.Name = info->program_name;
+		p.SectionName = info->section_name;
+		p.Data.resize(info->raw_data_size);
+		memcpy(p.Data.data(), info->raw_data, info->raw_data_size);
+		p.Type = info->program_type;
+		p.ExpectedAttachType = info->expected_attach_type;
+		p.OffsetInSection = (uint32_t)info->offset_in_section;
+		auto stats = info->stats;
+		while (stats) {
+			BpfStat stat{ stats->key, stats->value };
+			p.Stats.push_back(std::move(stat));
+			stats = stats->next;
+		}
+		programs.push_back(std::move(p));
+		info = info->next;
+	}
+
+	ebpf_free_programs(start);
+
+	return programs;
+}
+
+std::string BpfSystem::DisassembleProgram(BpfProgramEx const& p) {
+	const char* text;
+	ebpf_api_elf_disassemble_program(p.FileName.c_str(), p.SectionName.c_str(), p.Name.c_str(), &text, &text);
+	std::string result(text);
+	ebpf_free_string(text);
+	return result;
 }
 
 bool BpfMap::IsPerCpu() const {

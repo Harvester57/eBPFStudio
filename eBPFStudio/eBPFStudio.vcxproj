@@ -80,12 +80,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgUseStatic>true</VcpkgUseStatic>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgUseStatic>true</VcpkgUseStatic>
-  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -228,6 +224,7 @@
     <ClCompile Include="LinksView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MapsView.cpp" />
+    <ClCompile Include="ObjectFileView.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -243,6 +240,7 @@
     <ClInclude Include="LinksView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MapsView.h" />
+    <ClInclude Include="ObjectFileView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ProgramsView.h" />
@@ -252,10 +250,13 @@
     <ResourceCompile Include="eBPFStudio.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\Binary.ico" />
     <Image Include="res\cpu.ico" />
     <Image Include="res\Database.ico" />
     <Image Include="res\eBPFStudio.ico" />
     <Image Include="res\link.ico" />
+    <Image Include="res\Object.ico" />
+    <Image Include="res\open.ico" />
     <Image Include="res\refresh.ico" />
     <Image Include="res\System.ico" />
   </ItemGroup>

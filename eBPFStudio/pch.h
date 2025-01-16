@@ -26,6 +26,7 @@ extern CAppModule _Module;
 #include <format>
 #include <ranges>
 #include <algorithm>
+#include <unordered_map>
 
 #include <dontuse.h>
 

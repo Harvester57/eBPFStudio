@@ -114,6 +114,22 @@ struct BpfMapItem {
     std::unique_ptr<uint8_t[]> Value;
 };
 
+struct BpfStat {
+    std::string Key;
+    int Value;
+};
+
+struct BpfProgramEx {
+    std::string FileName;
+    std::string Name;
+    std::string SectionName;
+    GUID Type;
+    GUID ExpectedAttachType;
+    std::vector<uint8_t> Data;
+    uint32_t OffsetInSection;
+    std::vector<BpfStat> Stats;
+};
+
 class BpfSystem {
 public:
 	static std::vector<BpfProgram> EnumPrograms();
@@ -121,5 +137,8 @@ public:
     static std::vector<BpfMap> EnumMaps();
     static std::vector<BpfLink> EnumLinks();
     static std::vector<BpfMapItem> GetMapData(uint32_t id);
+
+    static std::vector<BpfProgramEx> EnumProgramsInFile(const char* path, std::string* errMsg = nullptr);
+    static std::string DisassembleProgram(BpfProgramEx const& p);
 };
 

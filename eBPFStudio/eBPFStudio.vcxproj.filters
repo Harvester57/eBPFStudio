@@ -45,6 +45,9 @@
     <ClCompile Include="LinksView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectFileView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -74,6 +77,9 @@
     <ClInclude Include="LinksView.h">
       <Filter>Views</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectFileView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="eBPFStudio.rc">
@@ -97,6 +103,15 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\link.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Object.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\Binary.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\open.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

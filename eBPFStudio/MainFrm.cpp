@@ -11,6 +11,7 @@
 #include "ProgramsView.h"
 #include "MapsView.h"
 #include "LinksView.h"
+#include "ObjectFileView.h"
 
 #define WINDOW_MENU_POSITION	4
 
@@ -26,11 +27,16 @@ BOOL CMainFrame::OnIdle() {
 	return FALSE;
 }
 
+HFONT CMainFrame::GetMonoFont() const {
+	return m_MonoFont.m_hFont;
+}
+
 void CMainFrame::InitMenu() {
 	struct {
 		UINT id, icon;
 		HICON hIcon = nullptr;
 	} cmds[] = {
+		{ ID_FILE_OPEN, IDI_OPEN },
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
 	};
 
@@ -44,6 +50,8 @@ void CMainFrame::InitMenu() {
 
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	ToolBarButtonInfo const buttons[] = {
+		{ ID_FILE_OPEN, IDI_OPEN },
+		{ 0 },
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
@@ -59,7 +67,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 4, 4);
 	UINT ids[] = { 
-		IDR_MAINFRAME, IDI_MAPS, IDI_LINK 
+		IDR_MAINFRAME, IDI_MAPS, IDI_LINK, IDI_OBJECT
 	};
 	for (auto id : ids)
 		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
@@ -80,6 +88,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	InitMenu();
 	UIAddMenu(menuMain);
 	AddMenu(menuMain);
+
+	m_MonoFont.CreatePointFont(100, L"Consolas");
 
 	PostMessage(WM_COMMAND, ID_FILE_NEW);
 
@@ -169,5 +179,24 @@ LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 	int nPage = wID - ID_WINDOW_TABFIRST;
 	m_Tabs.SetActivePage(nPage);
 
+	return 0;
+}
+
+LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(TRUE, nullptr, nullptr, OFN_EXPLORER | OFN_ENABLESIZING,
+		L"Object Files\0*.o\0Binary Files\0*dll;*.sys\0Source Files\0*.c\0All Files\0*.*\0", m_hWnd);
+	ThemeHelper::Suspend();
+	auto ok = IDOK == dlg.DoModal();
+	ThemeHelper::Resume();
+	if(ok) {
+		auto view = new CObjectFileView(this);
+		if(!view->Open(dlg.m_szFileName)) {
+			AtlMessageBox(m_hWnd, L"No programs found in file.", IDR_MAINFRAME, MB_ICONWARNING);
+			delete view;
+			return 0;
+		}
+		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
+		m_Tabs.AddPage(view->m_hWnd, dlg.m_szFileTitle, 3, view);
+	}
 	return 0;
 }
