@@ -213,13 +213,50 @@ std::vector<BpfProgramEx> BpfSystem::EnumProgramsInFile(const char* path, std::s
 }
 
 std::string BpfSystem::DisassembleProgram(BpfProgramEx const& p) {
-	const char* text;
+	const char* text = nullptr;
 	ebpf_api_elf_disassemble_program(p.FileName.c_str(), p.SectionName.c_str(), p.Name.c_str(), &text, &text);
 	std::string result(text);
 	ebpf_free_string(text);
+
 	return result;
+}
+
+const char* BpfSystem::GetProgramTypeName(GUID const& type) {
+	return ebpf_get_program_type_name(&type);
+}
+
+const char* BpfSystem::GetAttachTypeName(GUID const& type) {
+	return ebpf_get_attach_type_name(&type);
+}
+
+BpfObject BpfSystem::LoadProgram(BpfProgramEx const& p, BpfExecutionType execType) {
+	auto object = bpf_object__open(p.FileName.c_str());
+	if (!object)
+		return nullptr;
+
+	BpfObject obj(object);
+
+	if (bpf_object__load(obj) != EBPF_SUCCESS)
+		return nullptr;
+
+	if (ebpf_object_set_execution_type(object, (ebpf_execution_type_t)execType) != EBPF_SUCCESS)
+		return nullptr;
+
+	return obj;
 }
 
 bool BpfMap::IsPerCpu() const {
 	return Type == BpfMapType::LruPerCpuHash || Type == BpfMapType::PerCpuArray || Type == BpfMapType::PerCpuHash;
+}
+
+BpfObject::BpfObject(bpf_object* obj) : m_Object(obj) {
+}
+
+BpfObject::operator bpf_object* () const {
+	return m_Object;
+}
+
+BpfObject::~BpfObject() {
+	if (m_Object)
+		bpf_object__close(m_Object);
 }

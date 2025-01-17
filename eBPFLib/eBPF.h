@@ -5,6 +5,8 @@
 #include <memory>
 #include <guiddef.h>
 
+struct bpf_object;
+
 enum class BpfProgramType {
     Unspecified,
     Xdp,
@@ -130,6 +132,20 @@ struct BpfProgramEx {
     std::vector<BpfStat> Stats;
 };
 
+struct BpfObject {
+    BpfObject(bpf_object* obj);
+    BpfObject(BpfObject const&) = delete;
+    BpfObject& operator=(BpfObject const&) = delete;
+    BpfObject(BpfObject&&) = default;
+    BpfObject& operator=(BpfObject&&) = default;
+
+    operator bpf_object* () const;
+    ~BpfObject();
+
+private:
+    bpf_object* m_Object;
+};
+
 class BpfSystem {
 public:
 	static std::vector<BpfProgram> EnumPrograms();
@@ -140,5 +156,10 @@ public:
 
     static std::vector<BpfProgramEx> EnumProgramsInFile(const char* path, std::string* errMsg = nullptr);
     static std::string DisassembleProgram(BpfProgramEx const& p);
+
+    static const char* GetProgramTypeName(GUID const& type);
+    static const char* GetAttachTypeName(GUID const& type);
+
+    static BpfObject LoadProgram(BpfProgramEx const& p, BpfExecutionType execType = BpfExecutionType::JIT);
 };
 

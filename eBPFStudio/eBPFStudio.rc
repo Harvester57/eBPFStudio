@@ -114,6 +114,8 @@ IDI_BINARY              ICON                    "res\\Binary.ico"
 
 IDI_OPEN                ICON                    "res\\open.ico"
 
+IDI_STATS               ICON                    "res\\Statistics.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

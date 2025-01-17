@@ -114,5 +114,8 @@
     <Image Include="res\open.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\Statistics.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

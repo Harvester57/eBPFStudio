@@ -258,6 +258,7 @@
     <Image Include="res\Object.ico" />
     <Image Include="res\open.ico" />
     <Image Include="res\refresh.ico" />
+    <Image Include="res\Statistics.ico" />
     <Image Include="res\System.ico" />
   </ItemGroup>
   <ItemGroup>

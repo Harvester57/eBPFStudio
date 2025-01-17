@@ -76,8 +76,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UISetCheck(ID_VIEW_TOOLBAR, 1);
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
-	// register object for message filtering and idle updates
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
+	auto pLoop = _Module.GetMessageLoop();
 	ATLASSERT(pLoop != nullptr);
 	pLoop->AddMessageFilter(this);
 	pLoop->AddIdleHandler(this);
@@ -97,8 +96,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 }
 
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
-	// unregister message filtering and idle updates
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
+	auto pLoop = _Module.GetMessageLoop();
 	ATLASSERT(pLoop != nullptr);
 	pLoop->RemoveMessageFilter(this);
 	pLoop->RemoveIdleHandler(this);

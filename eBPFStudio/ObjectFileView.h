@@ -37,10 +37,11 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 protected:
+	CString GetColumnTextStat(int row, int column) const;
 	void UpdateProgramData(int row);
 
 	enum class ColumnType {
-		Name, Id, Section, Type, DataSize, Size, AttachType, Offset,
+		Name, Id, Section, Type, DataSize, Size, AttachType, Offset, Value, Details,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -51,15 +52,17 @@ protected:
 private:
 	struct ProgramExtra {
 		std::wstring Assembly;
+		std::vector<BpfStat> Stats;
 	};
 
 	CCustomHorSplitterWindow m_Splitter;
 	CListViewCtrl m_List;
 	CCustomTabView m_Tabs;
 	CHexControl m_HexView;
+	CListViewCtrl m_StatList;
 	CEdit m_DisassemblyView;
 	std::vector<BpfProgramEx> m_Programs;
 	std::unordered_map<std::string, ProgramExtra> m_Extra;
-
+	BpfProgramEx* m_SelectedProgram{ nullptr };
 	CString m_Path;
 };

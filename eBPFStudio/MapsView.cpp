@@ -115,9 +115,7 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 
 	cm->DeleteColumn(0);
 
-	CFont font;
-	font.CreatePointFont(100, L"Consolas");
-	m_MapDataList.SetFont(font.Detach());
+	m_MapDataList.SetFont(Frame()->GetMonoFont());
 
 	m_MapDataList.GetHeader().SetFont(m_MapList.GetFont());
 	Refresh();
