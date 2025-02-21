@@ -88,6 +88,17 @@ LRESULT CProgramsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CProgramsView::OnProgramUnload(WORD, WORD, HWND, BOOL&) {
+	int n = m_List.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	auto& p = m_Programs[n];
+	BpfSystem::UnloadProgram(p.Id);
+
+	return 0;
+}
+
 void CProgramsView::Refresh() {
 	m_Programs = BpfSystem::EnumPrograms();
 	m_List.SetItemCount((int)m_Programs.size());

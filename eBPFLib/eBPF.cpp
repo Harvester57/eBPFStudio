@@ -3,10 +3,46 @@
 #include <ebpf_api.h>
 #include <bpf/bpf.h>
 #include <io.h>
+#include <wil\resource.h>
 
-bool LocalClose(int fd) {
-	return _close(fd) == 0;
+namespace {
+	const PCWSTR ServiceNames[] = {
+		L"netebpfext", L"ebpfcore", L"ebpfsvc",
+	};
+
+	bool LocalClose(int fd) {
+		return _close(fd) == 0;
+	}
+
+	bool StartService(PCWSTR name) {
+		wil::unique_schandle hScm(::OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS));
+		if (!hScm)
+			return false;
+
+		wil::unique_schandle hService(::OpenService(hScm.get(), name, SERVICE_ALL_ACCESS));
+		if (!hService)
+			return false;
+
+		return ::StartService(hService.get(), 0, nullptr);
+	}
+
+	bool StopService(PCWSTR name) {
+		wil::unique_schandle hScm(::OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS));
+		if (!hScm)
+			return false;
+
+		wil::unique_schandle hService(::OpenService(hScm.get(), name, SERVICE_ALL_ACCESS));
+		if (!hService)
+			return false;
+
+		SERVICE_STATUS status;
+		if (!::ControlService(hService.get(), SERVICE_CONTROL_STOP, &status))
+			return false;
+
+		return true;
+	}
 }
+
 
 std::vector<BpfProgram> BpfSystem::EnumPrograms() {
 	uint32_t id = 0;
@@ -21,7 +57,6 @@ std::vector<BpfProgram> BpfSystem::EnumPrograms() {
 		auto p = GetProgramById(id);
 		if (!p)
 			break;
-
 		programs.push_back(std::move(*p));
 	}
 	return programs;
@@ -229,20 +264,150 @@ const char* BpfSystem::GetAttachTypeName(GUID const& type) {
 	return ebpf_get_attach_type_name(&type);
 }
 
-BpfObject BpfSystem::LoadProgram(BpfProgramEx const& p, BpfExecutionType execType) {
-	auto object = bpf_object__open(p.FileName.c_str());
-	if (!object)
-		return nullptr;
+int BpfSystem::LoadProgramsFromFile(char const* path, const char* pinPath, BpfExecutionType exeType) {
+	auto obj = bpf_object__open(path);
+	if (!obj)
+		return 0;
 
-	BpfObject obj(object);
+	int count = 0;
+	bpf_program* program = nullptr;
+	do {
+		if (auto error = ebpf_object_set_execution_type(obj, (ebpf_execution_type_t)exeType); error != EBPF_SUCCESS)
+			break;
 
-	if (bpf_object__load(obj) != EBPF_SUCCESS)
-		return nullptr;
+		program = bpf_object__next_program(obj, program);
+		if (!program)
+			break;
 
-	if (ebpf_object_set_execution_type(object, (ebpf_execution_type_t)execType) != EBPF_SUCCESS)
-		return nullptr;
+		if (auto error = bpf_object__load(obj); error < 0) {
+			printf("Failed to load program (%d)\n", error);
+			size_t log_buffer_size;
+			s_LastErrorText = bpf_program__log_buf(program, &log_buffer_size);
+			break;
+		}
 
-	return obj;
+		bpf_link* link;
+		if (auto err = ebpf_program_attach(program, nullptr, nullptr, 0, &link); err != ERROR_SUCCESS)
+			break;
+
+		auto bs = strrchr(path, '\\');
+		auto name = std::string(bs ? bs + 1 : path) + "::" + bpf_program__name(program);
+
+		//auto fd = bpf_program__fd(program);
+
+		//if (bpf_link__pin(link, name.c_str()) < 0) {
+		//	fprintf(stderr, "Failed to pin eBPF link: %d\n", errno);
+		//	return 1;
+		//}
+
+		if (bpf_program__pin(program, pinPath ? pinPath : path) < 0)
+			break;
+		count++;
+	} while (false);
+	if (count > 0)
+		s_LastErrorText.clear();
+
+	bpf_object__close(obj);
+	return count;
+}
+
+bool BpfSystem::UnloadProgram(const char* name, const char* pinPath, const char* filePath) {
+	auto obj = bpf_object__open(filePath);
+	if (!obj)
+		return false;
+
+	bpf_program* prog = nullptr;
+	do {
+		prog = bpf_object__next_program(obj, prog);
+		if (prog && strcmp(bpf_program__name(prog), name) == 0)
+			break;
+	} while (prog);
+	if (prog == nullptr)
+		return false;
+
+	auto ok = false;
+	auto fd = bpf_program__fd(prog);
+	if (fd > 0) {
+		ok = bpf_prog_detach(fd, bpf_attach_type::BPF_ATTACH_TYPE_UNSPEC);
+		LocalClose(fd);
+	}
+	bpf_object__close(obj);
+
+	return ok;
+}
+
+bool BpfSystem::UnloadProgram(uint32_t id) {
+	auto fd = bpf_prog_get_fd_by_id(id);
+	if (fd < 0)
+		return false;
+
+	auto ok = bpf_prog_detach(fd, bpf_attach_type::BPF_ATTACH_TYPE_UNSPEC) == 0;
+	LocalClose(fd);
+	return ok;
+}
+
+bool BpfSystem::DetachLink(uint32_t linkId) {
+	uint32_t id = 0;
+	bool success = false;
+	for(;;) {
+		auto err = bpf_link_get_next_id(id, &id);
+		if (err)
+			return false;
+
+		if (id != linkId)
+			continue;
+
+		auto fd = bpf_link_get_fd_by_id(id);
+		if (fd < 0)
+			return false;
+
+		success = bpf_link_detach(fd) == 0;
+		break;
+	}
+
+	return success;
+}
+
+std::string const& BpfSystem::GetLastErrorText() {
+	return s_LastErrorText;
+}
+
+bool BpfSystem::StartServices() {
+	for (auto& name : ServiceNames)
+		StartService(name);
+	return true;
+}
+
+bool BpfSystem::StopServices() {
+	for (auto& name : ServiceNames)
+		StopService(name);
+	return true;
+}
+
+bool BpfSystem::RestartServices() {
+	StopServices();
+	return StartServices();
+}
+
+std::vector<BpfServiceStatus> BpfSystem::GetServicesStatus() {
+	wil::unique_schandle hScm(::OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS));
+	if (!hScm)
+		return {};
+
+	SERVICE_STATUS status;
+	std::vector<BpfServiceStatus> services;
+	for (auto name : ServiceNames) {
+		wil::unique_schandle hService(::OpenService(hScm.get(), name, SERVICE_QUERY_STATUS));
+		if (hService) {
+			if (::QueryServiceStatus(hService.get(), &status)) {
+				BpfServiceStatus ss;
+				ss.Name = name;
+				ss.Running = status.dwCurrentState = SERVICE_RUNNING;
+				services.push_back(std::move(ss));
+			}
+		}
+	}
+	return services;
 }
 
 bool BpfMap::IsPerCpu() const {
@@ -260,3 +425,4 @@ BpfObject::~BpfObject() {
 	if (m_Object)
 		bpf_object__close(m_Object);
 }
+

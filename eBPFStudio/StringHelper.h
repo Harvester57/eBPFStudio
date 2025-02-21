@@ -7,6 +7,8 @@ struct StringHelper abstract final{
 	static PCWSTR MapTypeToString(BpfMapType type);
 	static std::wstring FormatNumber(void const* p, uint32_t size);
 	static std::wstring BufferToHexString(void const* p, uint32_t size);
+	static std::string BufferToCharString(void const* p, uint32_t size);
+
 	static PCWSTR ExeutionTypeToString(BpfExecutionType type);
 	static PCWSTR LinkTypeToString(BpfLinkType type);
 	static PCWSTR AttachTypeToString(BpfAttachType type);

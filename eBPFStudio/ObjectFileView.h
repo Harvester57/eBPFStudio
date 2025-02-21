@@ -7,6 +7,7 @@
 #include <CustomSplitterWindow.h>
 #include <CustomTabView.h>
 #include <HexControl.h>
+//#include <scintilla/Scintilla.h>
 
 class CObjectFileView :
 	public CFrameView<CObjectFileView, IMainFrame>,

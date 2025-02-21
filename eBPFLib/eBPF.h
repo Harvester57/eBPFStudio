@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <guiddef.h>
+#include <functional>
 
 struct bpf_object;
 
@@ -146,6 +147,11 @@ private:
     bpf_object* m_Object;
 };
 
+struct BpfServiceStatus {
+    std::wstring Name;
+    bool Running;
+};
+
 class BpfSystem {
 public:
 	static std::vector<BpfProgram> EnumPrograms();
@@ -160,6 +166,21 @@ public:
     static const char* GetProgramTypeName(GUID const& type);
     static const char* GetAttachTypeName(GUID const& type);
 
-    static BpfObject LoadProgram(BpfProgramEx const& p, BpfExecutionType execType = BpfExecutionType::JIT);
+    static int LoadProgramsFromFile(char const* path, const char* pinPath = nullptr, BpfExecutionType type = BpfExecutionType::Any);
+    static bool UnloadProgram(const char* name, const char* pinPath, const char* filePath);
+    static bool UnloadProgram(uint32_t id);
+
+    static bool DetachLink(uint32_t id);
+    static std::string const& GetLastErrorText();
+
+    static bool StartServices();
+    static bool StopServices();
+    static bool RestartServices();
+    static std::vector<BpfServiceStatus> GetServicesStatus();
+
+private:
+    static int OpenLink(uint32_t id);
+
+    inline static std::string s_LastErrorText;
 };
 

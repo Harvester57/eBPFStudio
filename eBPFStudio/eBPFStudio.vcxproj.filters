@@ -117,5 +117,14 @@
     <Image Include="res\Statistics.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\check.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\ProgramLoad.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

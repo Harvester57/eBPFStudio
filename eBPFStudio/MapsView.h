@@ -38,7 +38,7 @@ protected:
 
 	enum class ColumnType {
 		Name, Id, KeySize, ValueSize, Type, PinnedPathCount, MaxEntries, Flags,
-		Key, KeyHex, Value, ValueHex,
+		Key, KeyHex, Value, ValueHex, ValueChars,
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

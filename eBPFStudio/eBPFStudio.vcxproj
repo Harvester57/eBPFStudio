@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\eBPF-for-Windows.x64.0.20.0\build\native\ebpf-for-windows.x64.props" Condition="Exists('..\packages\eBPF-for-Windows.x64.0.20.0\build\native\ebpf-for-windows.x64.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -70,9 +71,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -251,12 +254,14 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Binary.ico" />
+    <Image Include="res\check.ico" />
     <Image Include="res\cpu.ico" />
     <Image Include="res\Database.ico" />
     <Image Include="res\eBPFStudio.ico" />
     <Image Include="res\link.ico" />
     <Image Include="res\Object.ico" />
     <Image Include="res\open.ico" />
+    <Image Include="res\ProgramLoad.ico" />
     <Image Include="res\refresh.ico" />
     <Image Include="res\Statistics.ico" />
     <Image Include="res\System.ico" />
@@ -269,7 +274,15 @@
       <Project>{ae53419f-a769-4548-8e15-e311904df7df}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\eBPF-for-Windows.x64.0.20.0\build\native\ebpf-for-windows.x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\eBPF-for-Windows.x64.0.20.0\build\native\ebpf-for-windows.x64.props'))" />
+  </Target>
 </Project>

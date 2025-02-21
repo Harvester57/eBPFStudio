@@ -23,8 +23,12 @@ CString CMapsView::GetColumnText(HWND hWnd, int row, int column) const {
 }
 
 CString CMapsView::GetColumnTextMapData(int row, int column) const {
+	auto index = m_MapList.GetSelectedIndex();
+	if (index < 0)
+		return L"";
+
 	auto& m = m_MapData[row];
-	auto& map = m_Maps[m_MapList.GetSelectedIndex()];
+	auto& map = m_Maps[index];
 
 	switch (static_cast<ColumnType>(GetColumnManager(m_MapDataList)->GetColumnTag(column))) {
 		case ColumnType::Id: return std::to_wstring(m.Index + 1).c_str();
@@ -32,6 +36,7 @@ CString CMapsView::GetColumnTextMapData(int row, int column) const {
 		case ColumnType::Value: return map.ValueSize <= 8 ? StringHelper::FormatNumber(m.Value.get(), map.ValueSize).c_str() : L"";
 		case ColumnType::KeyHex: return StringHelper::BufferToHexString(m.Key.get(), map.KeySize).c_str();
 		case ColumnType::ValueHex: return StringHelper::BufferToHexString(m.Value.get(), map.ValueSize).c_str();
+		case ColumnType::ValueChars: return StringHelper::BufferToCharString(m.Value.get(), map.ValueSize).c_str();
 	}
 	return L"";
 }
@@ -51,6 +56,11 @@ void CMapsView::OnStateChanged(HWND hWnd, int from, int to, UINT oldState, UINT 
 }
 
 void CMapsView::UpdateMapData(int row) {
+	if (row < 0) {
+		m_MapDataList.SetItemCount(0);
+		return;
+	}
+
 	auto& map = m_Maps[row];
 
 	m_MapData = BpfSystem::GetMapData(map.Id);
@@ -112,6 +122,7 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	cm->AddColumn(L"Key (Hex)", LVCFMT_LEFT, 200, ColumnType::KeyHex);
 	cm->AddColumn(L"Value", LVCFMT_RIGHT, 130, ColumnType::Value);
 	cm->AddColumn(L"Value (Hex)", LVCFMT_LEFT, 360, ColumnType::ValueHex);
+	cm->AddColumn(L"Value (Chars)", LVCFMT_LEFT, 150, ColumnType::ValueChars);
 
 	cm->DeleteColumn(0);
 
@@ -132,4 +143,5 @@ void CMapsView::Refresh() {
 	m_Maps = BpfSystem::EnumMaps();
 
 	m_MapList.SetItemCount((int)m_Maps.size());
+	UpdateMapData(m_MapList.GetSelectedIndex());
 }

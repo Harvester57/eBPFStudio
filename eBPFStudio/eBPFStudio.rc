@@ -54,6 +54,7 @@ BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Load Program...",            ID_PROGRAM_LOAD
         MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
         MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
         MENUITEM SEPARATOR
@@ -73,9 +74,28 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
     END
+    POPUP "e&BPF"
+    BEGIN
+        MENUITEM "&Load Program...\tCtrl+L",    ID_PROGRAM_LOAD
+        MENUITEM "&Unload Program",             ID_PROGRAM_UNLOAD
+        MENUITEM SEPARATOR
+        MENUITEM "&Detach Link",                ID_BPF_DETACHLINK
+        MENUITEM SEPARATOR
+        MENUITEM "&Pin",                        ID_BPF_PIN
+        MENUITEM "Unpin",                       ID_BPF_UNPIN
+    END
     POPUP "&Options"
     BEGIN
         MENUITEM "&Always On Top",              ID_OPTIONS_ALWAYSONTOP
+        MENUITEM "&Dark Mode",                  ID_OPTIONS_DARKMODE
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&Start Services",             ID_TOOLS_STARTSERVICES
+        MENUITEM "Sto&p Services",              ID_TOOLS_STOPSERVICES
+        MENUITEM "&Restart Services",           ID_TOOLS_RESTARTSERVICES
+        MENUITEM SEPARATOR
+        MENUITEM "Services Status...",          ID_TOOLS_SE
     END
     POPUP "&Window"
     BEGIN
@@ -115,6 +135,10 @@ IDI_BINARY              ICON                    "res\\Binary.ico"
 IDI_OPEN                ICON                    "res\\open.ico"
 
 IDI_STATS               ICON                    "res\\Statistics.ico"
+
+IDI_CHECK               ICON                    "res\\check.ico"
+
+IDI_PROGRAM_LOAD        ICON                    "res\\ProgramLoad.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -181,8 +205,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,0,0
- PRODUCTVERSION 0,1,0,0
+ FILEVERSION 0,2,0,0
+ PRODUCTVERSION 0,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -198,12 +222,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "eBPF Studio"
-            VALUE "FileVersion", "0.1.0.0"
+            VALUE "FileVersion", "0.2.0.0"
             VALUE "InternalName", "eBPFStudio"
             VALUE "LegalCopyright", "©2025 Pavel Yosifovich"
             VALUE "OriginalFilename", "eBPFStudio.exe"
             VALUE "ProductName", "eBPF Studio"
-            VALUE "ProductVersion", "0.1.0.0"
+            VALUE "ProductVersion", "0.2.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -288,6 +312,7 @@ STRINGTABLE
 BEGIN
     ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
     ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+    ID_VIEW_REFRESH         "\nLoad"
 END
 
 STRINGTABLE
@@ -316,6 +341,11 @@ END
 STRINGTABLE
 BEGIN
     ATL_IDS_MRU_FILE        "Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_PROGRAM_LOAD         "\nLoad Program"
 END
 
 #endif    // English (United States) resources

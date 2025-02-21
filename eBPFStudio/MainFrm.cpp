@@ -4,16 +4,14 @@
 
 #include "pch.h"
 #include "resource.h"
-
-#include "aboutdlg.h"
+#include "Aboutdlg.h"
 #include "MainFrm.h"
 #include <ToolbarHelper.h>
 #include "ProgramsView.h"
 #include "MapsView.h"
 #include "LinksView.h"
 #include "ObjectFileView.h"
-
-#define WINDOW_MENU_POSITION	4
+#include <eBPF.h>
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl<CMainFrame>::PreTranslateMessage(pMsg))
@@ -36,8 +34,9 @@ void CMainFrame::InitMenu() {
 		UINT id, icon;
 		HICON hIcon = nullptr;
 	} cmds[] = {
-		{ ID_FILE_OPEN, IDI_OPEN },
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ ID_FILE_OPEN, IDI_OPEN },
+		{ ID_PROGRAM_LOAD, IDI_PROGRAM_LOAD },
 	};
 
 	for (auto& cmd : cmds) {
@@ -50,9 +49,11 @@ void CMainFrame::InitMenu() {
 
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	ToolBarButtonInfo const buttons[] = {
+		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ 0 },
 		{ ID_FILE_OPEN, IDI_OPEN },
 		{ 0 },
-		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ ID_PROGRAM_LOAD, IDI_PROGRAM_LOAD },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
 	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
@@ -66,15 +67,12 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 4, 4);
-	UINT ids[] = { 
+	UINT ids[] = {
 		IDR_MAINFRAME, IDI_MAPS, IDI_LINK, IDI_OBJECT
 	};
 	for (auto id : ids)
 		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
 	m_Tabs.SetImageList(images);
-
-	UISetCheck(ID_VIEW_TOOLBAR, 1);
-	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
 	auto pLoop = _Module.GetMessageLoop();
 	ATLASSERT(pLoop != nullptr);
@@ -82,11 +80,15 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	pLoop->AddIdleHandler(this);
 
 	CMenuHandle menuMain = GetMenu();
-	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+	const UINT WindowMenuPosition = 6;
+	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WindowMenuPosition));
 
 	InitMenu();
 	UIAddMenu(menuMain);
 	AddMenu(menuMain);
+	SetCheckIcon(IDI_CHECK);
+
+	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
 	m_MonoFont.CreatePointFont(100, L"Consolas");
 
@@ -182,19 +184,66 @@ LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWnd
 
 LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
 	CSimpleFileDialog dlg(TRUE, nullptr, nullptr, OFN_EXPLORER | OFN_ENABLESIZING,
-		L"Object Files\0*.o\0Binary Files\0*dll;*.sys\0Source Files\0*.c\0All Files\0*.*\0", m_hWnd);
+		L"Object Files\0*.o\0Binary Files\0*.dll;*.sys\0Source Files\0*.c\0All Files\0*.*\0", m_hWnd);
 	ThemeHelper::Suspend();
 	auto ok = IDOK == dlg.DoModal();
 	ThemeHelper::Resume();
-	if(ok) {
+	if (ok) {
 		auto view = new CObjectFileView(this);
-		if(!view->Open(dlg.m_szFileName)) {
+		if (!view->Open(dlg.m_szFileName)) {
 			AtlMessageBox(m_hWnd, L"No programs found in file.", IDR_MAINFRAME, MB_ICONWARNING);
 			delete view;
 			return 0;
 		}
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
 		m_Tabs.AddPage(view->m_hWnd, dlg.m_szFileTitle, 3, view);
+	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnProgramLoad(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(TRUE, nullptr, nullptr, OFN_EXPLORER | OFN_ENABLESIZING,
+		L"Object Files\0*.o\0Binary Files\0*.sys\0\0All Files\0*.*\0", m_hWnd);
+	ThemeHelper::Suspend();
+	auto ok = IDOK == dlg.DoModal();
+	ThemeHelper::Resume();
+	if (ok) {
+		auto count = BpfSystem::LoadProgramsFromFile(CStringA(dlg.m_szFileName));
+		if (count == 0) {
+			auto errText = BpfSystem::GetLastErrorText();
+			AtlMessageBox(m_hWnd,
+				PCWSTR(CString(L"Failed to load program(s)") + (errText.empty() ? CString(L"") : (L" - " + CString(errText.c_str())))),
+				IDR_MAINFRAME, MB_ICONERROR);
+		}
+		else {
+			AtlMessageBox(m_hWnd, std::format(L"{} program(s) loaded", count).c_str(),
+				IDR_MAINFRAME, MB_ICONINFORMATION);
+			LRESULT result;
+			for (int i = 0; i < 3; i++) {
+				ProcessWindowMessage(m_Tabs.GetPageHWND(i), WM_COMMAND, ID_VIEW_REFRESH, 0, result, 1);
+			}
+		}
+	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnStartServices(WORD, WORD, HWND, BOOL&) {
+	if (!BpfSystem::StartServices()) {
+		AtlMessageBox(m_hWnd, L"Failed to start services", IDR_MAINFRAME, MB_ICONERROR);
+	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnRestartServices(WORD, WORD, HWND, BOOL&) {
+	if (!BpfSystem::RestartServices()) {
+		AtlMessageBox(m_hWnd, L"Failed to restart services", IDR_MAINFRAME, MB_ICONERROR);
+	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnStopServices(WORD, WORD, HWND, BOOL&) {
+	if (!BpfSystem::StopServices()) {
+		AtlMessageBox(m_hWnd, L"Failed to stop services", IDR_MAINFRAME, MB_ICONERROR);
 	}
 	return 0;
 }

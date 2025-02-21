@@ -12,19 +12,31 @@
 #define IDI_OBJECT                      207
 #define IDI_BINARY                      208
 #define IDI_OPEN                        209
-#define IDI_ICON1                       210
 #define IDI_STATS                       210
+#define IDI_CHECK                       211
+#define IDI_PROGRAM_LOAD                212
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS                      32775
 #define ID_OPTIONS_ALWAYSONTOP          32776
+#define ID_PROGRAM_LOAD                 32778
+#define ID_PROGRAM_UNPINPATH            32779
+#define ID_PROGRAM_UNLOAD               32780
+#define ID_OPTIONS_DARKMODE             32781
+#define ID_TOOLS_STOPSERVICES           32782
+#define ID_TOOLS_RESTARTSERVICES        32783
+#define ID_TOOLS_STARTSERVICES          32784
+#define ID_TOOLS_SE                     32785
+#define ID_BPF_DETACHLINK               32786
+#define ID_BPF_PIN                      32787
+#define ID_BPF_UNPIN                    32788
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        211
-#define _APS_NEXT_COMMAND_VALUE         32778
+#define _APS_NEXT_RESOURCE_VALUE        213
+#define _APS_NEXT_COMMAND_VALUE         32789
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

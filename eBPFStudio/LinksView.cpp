@@ -69,6 +69,19 @@ LRESULT CLinksView::OnRefresh(WORD, WORD, HWND, BOOL&) {
     return 0;
 }
 
+LRESULT CLinksView::OnDetachLink(WORD, WORD, HWND, BOOL&) {
+	auto selected = m_List.GetSelectedIndex();
+	if (selected < 0)
+		return 0;
+
+	if (BpfSystem::DetachLink(m_Links[selected].Id))
+		Refresh();
+	else
+		AtlMessageBox(m_hWnd, L"Failed to detach link", IDR_MAINFRAME, MB_ICONERROR);
+
+	return 0;
+}
+
 void CLinksView::Refresh() {
 	m_Links = BpfSystem::EnumLinks();
 	m_List.SetItemCount((int)m_Links.size());

@@ -50,8 +50,19 @@ std::wstring StringHelper::FormatNumber(void const* p, uint32_t size) {
 
 std::wstring StringHelper::BufferToHexString(void const* p, uint32_t size) {
     std::wstring text;
+    size = std::min(64u, size);
     for (uint32_t i = 0; i < size; i++)
         text += std::format(L"{:02X} ", *((uint8_t const*)p + i));
+    return text;
+}
+
+std::string StringHelper::BufferToCharString(void const* p, uint32_t size) {
+    std::string text;
+    size = std::min(64u, size);
+    for (uint32_t i = 0; i < size; i++) {
+        auto ch = *((const char*)p + i);
+        text += isprint(ch) ? ch : '.';
+    }
     return text;
 }
 
