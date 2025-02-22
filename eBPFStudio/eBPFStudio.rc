@@ -152,7 +152,7 @@ CAPTION "About eBPF Studio"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,68,60,50,14
-    CTEXT           "eBPF Studio v0.1\n\n©2025 Pavel Yosifovich",IDC_STATIC,46,23,94,26
+    CTEXT           "eBPF Studio v0.2.5\n\n©2025 Pavel Yosifovich",IDC_STATIC,46,23,94,26
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
 END
 
@@ -205,7 +205,7 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,0,0
+ FILEVERSION 0,2,5,0
  PRODUCTVERSION 0,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -221,8 +221,9 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
+            VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "eBPF Studio"
-            VALUE "FileVersion", "0.2.0.0"
+            VALUE "FileVersion", "0.2.5.0"
             VALUE "InternalName", "eBPFStudio"
             VALUE "LegalCopyright", "©2025 Pavel Yosifovich"
             VALUE "OriginalFilename", "eBPFStudio.exe"

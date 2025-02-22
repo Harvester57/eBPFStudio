@@ -272,8 +272,10 @@ int BpfSystem::LoadProgramsFromFile(char const* path, const char* pinPath, BpfEx
 	int count = 0;
 	bpf_program* program = nullptr;
 	do {
-		if (auto error = ebpf_object_set_execution_type(obj, (ebpf_execution_type_t)exeType); error != EBPF_SUCCESS)
-			break;
+		if (exeType != BpfExecutionType::Any) {
+			if (auto error = ebpf_object_set_execution_type(obj, (ebpf_execution_type_t)exeType); error != EBPF_SUCCESS)
+				break;
+		}
 
 		program = bpf_object__next_program(obj, program);
 		if (!program)
@@ -282,7 +284,9 @@ int BpfSystem::LoadProgramsFromFile(char const* path, const char* pinPath, BpfEx
 		if (auto error = bpf_object__load(obj); error < 0) {
 			printf("Failed to load program (%d)\n", error);
 			size_t log_buffer_size;
-			s_LastErrorText = bpf_program__log_buf(program, &log_buffer_size);
+			auto text = bpf_program__log_buf(program, &log_buffer_size);
+			if (text)
+				s_LastErrorText = text;
 			break;
 		}
 
