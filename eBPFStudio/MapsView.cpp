@@ -5,6 +5,18 @@
 #include "resource.h"
 #include "PinPathDlg.h"
 
+//bool SortPtr(const void* p1, const void* p2, uint32_t size, bool asc) {
+//	if (size <= sizeof(long long)) {
+//		long long v1 = 0, v2 = 0;
+//		memcpy(&v1, p1, size);
+//		memcpy(&v2, p2, size);
+//		return SortHelper::Sort(v1, v2, asc);
+//	}
+//
+//	auto compare = memcmp(p1, p2, size);
+//	return asc ? compare > 0 : compare < 0;
+//}
+
 CString CMapsView::GetColumnText(HWND hWnd, int row, int column) const {
 	if (hWnd == m_MapDataList)
 		return GetColumnTextMapData(row, column);
@@ -56,6 +68,28 @@ void CMapsView::OnStateChanged(HWND hWnd, int from, int to, UINT oldState, UINT 
 	}
 }
 
+void CMapsView::DoSortData(SortInfo const* si) {
+	if (m_MapData.empty())
+		return;
+
+	auto sort = [&](auto const& p1, auto const& p2) {
+		switch (static_cast<ColumnType>(GetColumnManager(m_MapDataList)->GetColumnTag(si->SortColumn))) {
+			case ColumnType::Id: return SortHelper::Sort(p1.Index, p2.Index, si->SortAscending);
+			case ColumnType::Key:
+			case ColumnType::KeyHex:
+				return SortHelper::Sort(p1.Key.get(), p2.Key.get(), m_CurrentMap.KeySize, si->SortAscending);
+
+			case ColumnType::Value:
+			case ColumnType::ValueHex:
+			case ColumnType::ValueChars:
+				return SortHelper::Sort(p1.Value.get(), p2.Value.get(), m_CurrentMap.KeySize, si->SortAscending);
+		}
+		return false;
+		};
+
+	std::ranges::sort(m_MapData, sort);
+}
+
 void CMapsView::UpdateMapData(int row) {
 	if (row < 0) {
 		m_MapDataList.SetItemCount(0);
@@ -63,12 +97,18 @@ void CMapsView::UpdateMapData(int row) {
 	}
 
 	auto& map = m_Maps[row];
+	m_CurrentMap = map;
 
 	m_MapData = BpfSystem::GetMapData(map.Id);
 	m_MapDataList.SetItemCount((int)m_MapData.size());
 }
 
 void CMapsView::DoSort(SortInfo const* si) {
+	if (si->hWnd == m_MapDataList) {
+		DoSortData(si);
+		return;
+	}
+		
 	auto sort = [&](auto const& p1, auto const& p2) {
 		switch (static_cast<ColumnType>(GetColumnManager(m_MapList)->GetColumnTag(si->SortColumn))) {
 			case ColumnType::Name: return SortHelper::Sort(p1.Name, p2.Name, si->SortAscending);
@@ -86,6 +126,11 @@ void CMapsView::DoSort(SortInfo const* si) {
 	std::ranges::sort(m_Maps, sort);
 }
 
+int CMapsView::GetSaveColumnRange(HWND, int& start) const {
+	start = 0;
+	return 1;
+}
+
 LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_hWndClient = m_Splitter.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
 	m_MapList.Create(m_Splitter, rcDefault, nullptr,
@@ -93,7 +138,7 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	m_MapList.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	m_MapDataList.Create(m_Splitter, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER);
+		WS_CHILD | WS_VISIBLE | LVS_OWNERDATA | LVS_REPORT | LVS_SHOWSELALWAYS);
 	m_MapDataList.SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_HEADERDRAGDROP);
 
 	CImageList images;
@@ -122,8 +167,8 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	cm->AddColumn(L"Key", LVCFMT_RIGHT, 130, ColumnType::Key);
 	cm->AddColumn(L"Key (Hex)", LVCFMT_LEFT, 200, ColumnType::KeyHex);
 	cm->AddColumn(L"Value", LVCFMT_RIGHT, 130, ColumnType::Value);
-	cm->AddColumn(L"Value (Hex)", LVCFMT_LEFT, 360, ColumnType::ValueHex);
-	cm->AddColumn(L"Value (Chars)", LVCFMT_LEFT, 150, ColumnType::ValueChars);
+	cm->AddColumn(L"Value (Hex)", LVCFMT_LEFT, 400, ColumnType::ValueHex);
+	cm->AddColumn(L"Value (Chars)", LVCFMT_LEFT, 350, ColumnType::ValueChars);
 
 	cm->DeleteColumn(0);
 
@@ -206,4 +251,15 @@ void CMapsView::Refresh() {
 
 	m_MapList.SetItemCount((int)m_Maps.size());
 	UpdateMapData(m_MapList.GetSelectedIndex());
+}
+
+LRESULT CMapsView::OnUpdateUI(UINT, WPARAM, LPARAM, BOOL&) {
+	auto selected = m_MapList.GetSelectedIndex();
+	auto& ui = Frame()->UI();
+	ui.UIEnable(ID_BPF_PIN, selected >= 0);
+	ui.UIEnable(ID_BPF_UNPIN, selected >= 0);
+	ui.UIEnable(ID_EBPF_PINWITHPATH, selected >= 0);
+	ui.UIEnable(ID_EBPF_UNPINWITHPATH, selected >= 0);
+
+	return 0;
 }

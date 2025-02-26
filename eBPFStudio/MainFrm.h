@@ -45,6 +45,8 @@ public:
 
 protected:
 	HFONT GetMonoFont() const override;
+	CAutoUpdateUI<CMainFrame>& UI() override;
+
 	void InitMenu();
 
 	// Handler prototypes (uncomment arguments if needed):

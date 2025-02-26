@@ -22,12 +22,21 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 }
 
 BOOL CMainFrame::OnIdle() {
+	UIEnable(ID_BPF_DETACHLINK, FALSE);
+	UIEnable(ID_PROGRAM_UNLOAD, FALSE);
+	auto iView = m_Tabs.GetActivePage();
+	if (iView >= 0)
+		::SendMessage(m_Tabs.GetPageHWND(iView), WM_UPDATEUI, 0, 0);
 	UIUpdateToolBar();
 	return FALSE;
 }
 
 HFONT CMainFrame::GetMonoFont() const {
 	return m_MonoFont.m_hFont;
+}
+
+CAutoUpdateUI<CMainFrame>& CMainFrame::UI() {
+	return *this;
 }
 
 void CMainFrame::InitMenu() {

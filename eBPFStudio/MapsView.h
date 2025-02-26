@@ -20,8 +20,10 @@ public:
 	int GetRowImage(HWND hWnd, int row, int column) const;
 	void OnStateChanged(HWND hWnd, int from, int to, UINT oldState, UINT newState);
 	void DoSort(SortInfo const* si);
+	int GetSaveColumnRange(HWND, int&) const;
 
 	BEGIN_MSG_MAP(CMapsView)
+		MESSAGE_HANDLER(WM_UPDATEUI, OnUpdateUI)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CVirtualListView<CMapsView>)
 		CHAIN_MSG_MAP(BaseFrame)
@@ -39,6 +41,7 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 protected:
+	void DoSortData(SortInfo const* si);
 	void UpdateMapData(int row);
 
 	enum class ColumnType {
@@ -52,6 +55,7 @@ protected:
 	LRESULT OnUnpin(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnPinWithPath(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnUnpinWithPath(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnUpdateUI(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
 	void Refresh();
 
@@ -60,5 +64,6 @@ private:
 	CListViewCtrl m_MapList;
 	CListViewCtrl m_MapDataList;
 	std::vector<BpfMap> m_Maps;
+	BpfMap m_CurrentMap;
 	std::vector<BpfMapItem> m_MapData;
 };

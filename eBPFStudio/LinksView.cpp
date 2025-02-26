@@ -63,6 +63,13 @@ LRESULT CLinksView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	return 0;
 }
 
+LRESULT CLinksView::OnUpdateUI(UINT, WPARAM, LPARAM, BOOL&) {
+	auto selected = m_List.GetSelectedIndex();
+	Frame()->UI().UIEnable(ID_BPF_DETACHLINK, selected >= 0);
+
+	return 0;
+}
+
 LRESULT CLinksView::OnRefresh(WORD, WORD, HWND, BOOL&) {
     Refresh();
 

@@ -19,6 +19,7 @@ public:
 	void DoSort(SortInfo const* si);
 
 	BEGIN_MSG_MAP(CLinksView)
+		MESSAGE_HANDLER(WM_UPDATEUI, OnUpdateUI);
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		CHAIN_MSG_MAP(CVirtualListView<CLinksView>)
 		CHAIN_MSG_MAP(BaseFrame)
@@ -38,6 +39,7 @@ protected:
 	};
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnUpdateUI(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnDetachLink(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 

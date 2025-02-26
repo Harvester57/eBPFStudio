@@ -83,6 +83,18 @@ LRESULT CProgramsView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 	return 0;
 }
 
+LRESULT CProgramsView::OnUpdateUI(UINT, WPARAM, LPARAM, BOOL&) {
+	auto selected = m_List.GetSelectedIndex();
+	auto& ui = Frame()->UI();
+	ui.UIEnable(ID_PROGRAM_UNLOAD, selected >= 0);
+	ui.UIEnable(ID_BPF_PIN, selected >= 0);
+	ui.UIEnable(ID_BPF_UNPIN, selected >= 0);
+	ui.UIEnable(ID_EBPF_PINWITHPATH, selected >= 0);
+	ui.UIEnable(ID_EBPF_UNPINWITHPATH, selected >= 0);
+
+	return 0;
+}
+
 LRESULT CProgramsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	Refresh();
 
