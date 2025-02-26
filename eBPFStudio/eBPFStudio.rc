@@ -71,6 +71,7 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "&Refresh",                    ID_VIEW_REFRESH
+        MENUITEM "Refresh &All",                ID_VIEW_REFRESHALL
         MENUITEM SEPARATOR
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
     END
@@ -286,13 +287,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "eBPF Studio v0.1"
+    IDR_MAINFRAME           "eBPF Studio v0.2.6"
 END
 
 STRINGTABLE
 BEGIN
     ID_FILE_NEW             "Create a new document\nNew"
-    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_OPEN            "Open an object file\nOpen"
     ID_FILE_CLOSE           "Close the active document\nClose"
     ID_FILE_SAVE            "Save the active document\nSave"
     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
@@ -317,10 +318,6 @@ END
 STRINGTABLE
 BEGIN
     ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
-    ID_WINDOW_ARRANGE       "Arrange icons at the bottom of the window\nArrange Icons"
-    ID_WINDOW_CASCADE       "Arrange windows so they overlap\nCascade Windows"
-    ID_WINDOW_TILE_HORZ     "Arrange windows as non-overlapping tiles\nTile Windows"
-    ID_WINDOW_TILE_VERT     "Arrange windows as non-overlapping tiles\nTile Windows"
     ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
 END
 
@@ -348,19 +345,11 @@ END
 
 STRINGTABLE
 BEGIN
-    ATL_IDS_SCSIZE          "Change the window size"
-    ATL_IDS_SCMOVE          "Change the window position"
-    ATL_IDS_SCMINIMIZE      "Reduce the window to an icon"
-    ATL_IDS_SCMAXIMIZE      "Enlarge the window to full size"
-    ATL_IDS_SCNEXTWINDOW    "Switch to the next document window"
-    ATL_IDS_SCPREVWINDOW    "Switch to the previous document window"
     ATL_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
 END
 
 STRINGTABLE
 BEGIN
-    ATL_IDS_SCRESTORE       "Restore the window to normal size"
-    ATL_IDS_SCTASKLIST      "Activate Task List"
     ATL_IDS_MDICHILD        "Activate this window"
 END
 
@@ -377,6 +366,13 @@ END
 STRINGTABLE
 BEGIN
     ID_PROGRAM_LOAD         "\nLoad Program"
+END
+
+STRINGTABLE
+BEGIN
+    ID_BPF_PIN              "\nPin"
+    ID_BPF_UNPIN            "\nUnpin"
+    ID_VIEW_REFRESHALL      "\nRefresh All"
 END
 
 #endif    // English (United States) resources

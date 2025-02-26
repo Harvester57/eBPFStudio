@@ -374,6 +374,28 @@ bool BpfSystem::PinMap(uint32_t id, const char* path) {
 	return success;
 }
 
+bool BpfSystem::PinProgram(uint32_t id, const char* path) {
+	auto fd = bpf_prog_get_fd_by_id(id);
+	if (fd < 0)
+		return false;
+
+	auto success = bpf_obj_pin(fd, path) == 0;
+	LocalClose(fd);
+
+	return success;
+}
+
+bool BpfSystem::PinLink(uint32_t id, const char* path) {
+	auto fd = bpf_link_get_fd_by_id(id);
+	if (fd < 0)
+		return false;
+
+	auto success = bpf_obj_pin(fd, path) == 0;
+	LocalClose(fd);
+
+	return success;
+}
+
 int BpfSystem::LoadProgramsFromFile(char const* path, const char* pinPath, BpfExecutionType exeType) {
 	auto obj = bpf_object__open(path);
 	if (!obj)

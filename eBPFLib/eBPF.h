@@ -183,6 +183,8 @@ public:
 
     static bool Unpin(const char* path);
     static bool PinMap(uint32_t id, const char* path);
+    static bool PinProgram(uint32_t id, const char* path);
+    static bool PinLink(uint32_t id, const char* path);
 
     static int LoadProgramsFromFile(char const* path, const char* pinPath = nullptr, BpfExecutionType type = BpfExecutionType::Any);
     static bool UnloadProgram(const char* name, const char* pinPath, const char* filePath);

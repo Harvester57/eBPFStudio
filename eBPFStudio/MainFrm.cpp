@@ -52,7 +52,7 @@ void CMainFrame::InitMenu() {
 
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	ToolBarButtonInfo const buttons[] = {
-		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ ID_VIEW_REFRESHALL, IDI_REFRESH },
 		{ 0 },
 		{ ID_FILE_OPEN, IDI_OPEN },
 		{ 0 },
@@ -229,10 +229,7 @@ LRESULT CMainFrame::OnProgramLoad(WORD, WORD, HWND, BOOL&) {
 		else {
 			AtlMessageBox(m_hWnd, std::format(L"{} program(s) loaded", count).c_str(),
 				IDR_MAINFRAME, MB_ICONINFORMATION);
-			LRESULT result;
-			for (int i = 0; i < 3; i++) {
-				ProcessWindowMessage(m_Tabs.GetPageHWND(i), WM_COMMAND, ID_VIEW_REFRESH, 0, result, 1);
-			}
+			PostMessage(WM_COMMAND, ID_VIEW_REFRESH);
 		}
 	}
 	return 0;
@@ -255,6 +252,14 @@ LRESULT CMainFrame::OnRestartServices(WORD, WORD, HWND, BOOL&) {
 LRESULT CMainFrame::OnStopServices(WORD, WORD, HWND, BOOL&) {
 	if (!BpfSystem::StopServices()) {
 		AtlMessageBox(m_hWnd, L"Failed to stop services", IDR_MAINFRAME, MB_ICONERROR);
+	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnViewRefresh(WORD, WORD, HWND, BOOL&) {
+	LRESULT result;
+	for (int i = 0; i < 4; i++) {
+		ProcessWindowMessage(m_Tabs.GetPageHWND(i), WM_COMMAND, ID_VIEW_REFRESH, 0, result, 1);
 	}
 	return 0;
 }

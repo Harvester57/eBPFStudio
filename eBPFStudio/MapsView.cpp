@@ -150,7 +150,7 @@ LRESULT CMapsView::OnUnpin(WORD, WORD, HWND, BOOL&) {
 		AtlMessageBox(m_hWnd, L"Map has no pinned paths", IDR_MAINFRAME, MB_ICONEXCLAMATION);
 		return 0;
 	}
-	if (!BpfSystem::Unpin(m_Maps[n].Name.c_str())) {
+	if (!BpfSystem::Unpin(map.Name.c_str())) {
 		AtlMessageBox(m_hWnd, L"Failed to unpin map", IDR_MAINFRAME, MB_ICONERROR);
 	}
 	else {

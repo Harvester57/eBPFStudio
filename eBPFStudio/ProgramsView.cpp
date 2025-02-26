@@ -7,6 +7,7 @@
 #include "ProgramsView.h"
 #include "StringHelper.h"
 #include <SortHelper.h>
+#include "PinPathDlg.h"
 
 BOOL CProgramsView::PreTranslateMessage(MSG* pMsg) {
 	pMsg;
@@ -102,4 +103,65 @@ LRESULT CProgramsView::OnProgramUnload(WORD, WORD, HWND, BOOL&) {
 void CProgramsView::Refresh() {
 	m_Programs = BpfSystem::EnumPrograms();
 	m_List.SetItemCount((int)m_Programs.size());
+}
+
+LRESULT CProgramsView::OnUnpin(WORD, WORD, HWND, BOOL&) {
+	auto n = m_List.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	auto& prog = m_Programs[n];
+	if (prog.PinnedPathCount == 0) {
+		AtlMessageBox(m_hWnd, L"Program has no pinned paths", IDR_MAINFRAME, MB_ICONEXCLAMATION);
+		return 0;
+	}
+	if (!BpfSystem::Unpin(prog.Name.c_str())) {
+		AtlMessageBox(m_hWnd, L"Failed to unpin program", IDR_MAINFRAME, MB_ICONERROR);
+	}
+	else {
+		Refresh();
+	}
+	return 0;
+}
+
+LRESULT CProgramsView::OnPinWithPath(WORD, WORD, HWND, BOOL&) {
+	auto n = m_List.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	CPinPathDlg dlg(CString(m_Programs[n].Name.c_str()));
+	if (dlg.DoModal() == IDOK) {
+		if (!BpfSystem::PinProgram(m_Programs[n].Id, CStringA(dlg.GetPath())))
+			AtlMessageBox(m_hWnd, L"Failed to pin program", IDR_MAINFRAME, MB_ICONERROR);
+		else
+			Refresh();
+	}
+	return 0;
+}
+
+LRESULT CProgramsView::OnUnpinWithPath(WORD, WORD, HWND, BOOL&) {
+	auto n = m_List.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	CPinPathDlg dlg(CString(m_Programs[n].Name.c_str()));
+	if (dlg.DoModal() == IDOK) {
+		if (!BpfSystem::Unpin(CStringA(dlg.GetPath())))
+			AtlMessageBox(m_hWnd, L"Failed to unpin program", IDR_MAINFRAME, MB_ICONERROR);
+		else
+			Refresh();
+	}
+	return 0;
+}
+
+LRESULT CProgramsView::OnPin(WORD, WORD, HWND, BOOL&) {
+	auto n = m_List.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	if (!BpfSystem::PinProgram(m_Programs[n].Id, m_Programs[n].Name.c_str()))
+		AtlMessageBox(m_hWnd, L"Failed to pin program", IDR_MAINFRAME, MB_ICONERROR);
+	else
+		Refresh();
+	return 0;
 }

@@ -26,6 +26,10 @@ public:
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
 		COMMAND_ID_HANDLER(ID_PROGRAM_UNLOAD, OnProgramUnload)
+		COMMAND_ID_HANDLER(ID_BPF_UNPIN, OnUnpin)
+		COMMAND_ID_HANDLER(ID_BPF_PIN, OnPin)
+		COMMAND_ID_HANDLER(ID_EBPF_PINWITHPATH, OnPinWithPath)
+		COMMAND_ID_HANDLER(ID_EBPF_UNPINWITHPATH, OnUnpinWithPath)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -41,6 +45,10 @@ protected:
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnProgramUnload(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnPin(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnUnpin(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnPinWithPath(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnUnpinWithPath(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	void Refresh();
 
