@@ -3,6 +3,7 @@
 #include "StringHelper.h"
 #include <SortHelper.h>
 #include "resource.h"
+#include "PinPathDlg.h"
 
 CString CMapsView::GetColumnText(HWND hWnd, int row, int column) const {
 	if (hWnd == m_MapDataList)
@@ -136,6 +137,67 @@ LRESULT CMapsView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 
 LRESULT CMapsView::OnRefresh(WORD, WORD, HWND, BOOL&) {
 	Refresh();
+	return 0;
+}
+
+LRESULT CMapsView::OnUnpin(WORD, WORD, HWND, BOOL&) {
+	auto n = m_MapList.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	auto& map = m_Maps[n];
+	if (map.PinnedPathCount == 0) {
+		AtlMessageBox(m_hWnd, L"Map has no pinned paths", IDR_MAINFRAME, MB_ICONEXCLAMATION);
+		return 0;
+	}
+	if (!BpfSystem::Unpin(m_Maps[n].Name.c_str())) {
+		AtlMessageBox(m_hWnd, L"Failed to unpin map", IDR_MAINFRAME, MB_ICONERROR);
+	}
+	else {
+		Refresh();
+	}
+	return 0;
+}
+
+LRESULT CMapsView::OnPinWithPath(WORD, WORD, HWND, BOOL&) {
+	auto n = m_MapList.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	CPinPathDlg dlg(CString(m_Maps[n].Name.c_str()));
+	if (dlg.DoModal() == IDOK) {
+		if (!BpfSystem::PinMap(m_Maps[n].Id, CStringA(dlg.GetPath())))
+			AtlMessageBox(m_hWnd, L"Failed to pin map", IDR_MAINFRAME, MB_ICONERROR);
+		else
+			Refresh();
+	}
+	return 0;
+}
+
+LRESULT CMapsView::OnUnpinWithPath(WORD, WORD, HWND, BOOL&) {
+	auto n = m_MapList.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	CPinPathDlg dlg(CString(m_Maps[n].Name.c_str()));
+	if (dlg.DoModal() == IDOK) {
+		if (!BpfSystem::Unpin(CStringA(dlg.GetPath())))
+			AtlMessageBox(m_hWnd, L"Failed to unpin map", IDR_MAINFRAME, MB_ICONERROR);
+		else
+			Refresh();
+	}
+	return 0;
+}
+
+LRESULT CMapsView::OnPin(WORD, WORD, HWND, BOOL&) {
+	auto n = m_MapList.GetSelectedIndex();
+	if (n < 0)
+		return 0;
+
+	if (!BpfSystem::PinMap(m_Maps[n].Id, m_Maps[n].Name.c_str()))
+		AtlMessageBox(m_hWnd, L"Failed to pin map", IDR_MAINFRAME, MB_ICONERROR);
+	else
+		Refresh();
 	return 0;
 }
 

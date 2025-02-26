@@ -12,6 +12,8 @@ struct StringHelper abstract final{
 	static PCWSTR ExeutionTypeToString(BpfExecutionType type);
 	static PCWSTR LinkTypeToString(BpfLinkType type);
 	static PCWSTR AttachTypeToString(BpfAttachType type);
+	static PCWSTR ObjectTypeToString(BpfObjectType type);
+
 	static CString GuidToString(GUID const& guid);
 	template<typename T>
 	static CString VectorToString(std::vector<T> const& values) {

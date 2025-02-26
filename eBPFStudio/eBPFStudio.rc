@@ -83,6 +83,9 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Pin",                        ID_BPF_PIN
         MENUITEM "Unpin",                       ID_BPF_UNPIN
+        MENUITEM SEPARATOR
+        MENUITEM "Pin with Path...",            ID_EBPF_PINWITHPATH
+        MENUITEM "Unpin with Path...",          ID_EBPF_UNPINWITHPATH
     END
     POPUP "&Options"
     BEGIN
@@ -140,6 +143,10 @@ IDI_CHECK               ICON                    "res\\check.ico"
 
 IDI_PROGRAM_LOAD        ICON                    "res\\ProgramLoad.ico"
 
+IDI_PIN                 ICON                    "res\\pin.ico"
+
+IDI_UNPIN               ICON                    "res\\unpin.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -154,6 +161,16 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,68,60,50,14
     CTEXT           "eBPF Studio v0.2.5\n\n©2025 Pavel Yosifovich",IDC_STATIC,46,23,94,26
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
+END
+
+IDD_PINPATH DIALOGEX 0, 0, 283, 77
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Pin Path"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_PATH,7,17,269,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,83,56,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,149,56,50,14
 END
 
 
@@ -171,6 +188,14 @@ BEGIN
         RIGHTMARGIN, 180
         TOPMARGIN, 7
         BOTTOMMARGIN, 74
+    END
+
+    IDD_PINPATH, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 276
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 70
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -205,8 +230,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,5,0
- PRODUCTVERSION 0,2,0,0
+ FILEVERSION 0,2,6,0
+ PRODUCTVERSION 0,2,6,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -223,12 +248,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scorpio Software"
             VALUE "FileDescription", "eBPF Studio"
-            VALUE "FileVersion", "0.2.5.0"
+            VALUE "FileVersion", "0.2.6.0"
             VALUE "InternalName", "eBPFStudio"
             VALUE "LegalCopyright", "©2025 Pavel Yosifovich"
             VALUE "OriginalFilename", "eBPFStudio.exe"
             VALUE "ProductName", "eBPF Studio"
-            VALUE "ProductVersion", "0.2.0.0"
+            VALUE "ProductVersion", "0.2.6.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -244,6 +269,11 @@ END
 //
 
 IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PINPATH AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

@@ -19,6 +19,9 @@
     <Filter Include="Views">
       <UniqueIdentifier>{a35f7962-5822-4c71-83cf-70ae3f115411}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{0ee24a0b-ad36-4235-8af0-e1da047cbe8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -28,9 +31,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainFrm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AboutDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StringHelper.cpp">
@@ -48,15 +48,21 @@
     <ClCompile Include="ObjectFileView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="PinsView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="PinPathDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainFrm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AboutDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -79,6 +85,15 @@
     </ClInclude>
     <ClInclude Include="ObjectFileView.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="PinsView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="PinPathDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutDlg.h">
+      <Filter>Dialogs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +136,12 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\ProgramLoad.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\pin.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\unpin.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

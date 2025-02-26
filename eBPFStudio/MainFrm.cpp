@@ -10,6 +10,7 @@
 #include "ProgramsView.h"
 #include "MapsView.h"
 #include "LinksView.h"
+#include "PinsView.h"
 #include "ObjectFileView.h"
 #include <eBPF.h>
 
@@ -37,6 +38,8 @@ void CMainFrame::InitMenu() {
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
 		{ ID_FILE_OPEN, IDI_OPEN },
 		{ ID_PROGRAM_LOAD, IDI_PROGRAM_LOAD },
+		{ ID_BPF_PIN, IDI_PIN },
+		{ ID_BPF_UNPIN, IDI_UNPIN },
 	};
 
 	for (auto& cmd : cmds) {
@@ -54,9 +57,12 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		{ ID_FILE_OPEN, IDI_OPEN },
 		{ 0 },
 		{ ID_PROGRAM_LOAD, IDI_PROGRAM_LOAD },
+		{ 0 },
+		{ ID_BPF_PIN, IDI_PIN },
+		{ ID_BPF_UNPIN, IDI_UNPIN },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
-	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
+	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, std::size(buttons));
 	AddSimpleReBarBand(tb);
 	UIAddToolBar(tb);
 
@@ -66,9 +72,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 
 	CImageList images;
-	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 4, 4);
+	images.Create(16, 16, ILC_COLOR32 | ILC_MASK, 8, 4);
 	UINT ids[] = {
-		IDR_MAINFRAME, IDI_MAPS, IDI_LINK, IDI_OBJECT
+		IDR_MAINFRAME, IDI_MAPS, IDI_LINK, IDI_PIN, IDI_OBJECT,
 	};
 	for (auto id : ids)
 		images.AddIcon(AtlLoadIconImage(id, 0, 16, 16));
@@ -127,6 +133,11 @@ LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		auto view = new CLinksView(this);
 		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 		m_Tabs.AddPage(view->m_hWnd, L"Links", 2, view);
+	}
+	{
+		auto view = new CPinsView(this);
+		view->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+		m_Tabs.AddPage(view->m_hWnd, L"Pins", 3, view);
 	}
 
 	m_Tabs.SetActivePage(0);

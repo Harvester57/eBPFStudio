@@ -152,12 +152,27 @@ struct BpfServiceStatus {
     bool Running;
 };
 
+enum class BpfObjectType {
+    Unknown,
+    Map,
+    Link,
+    Program,
+};
+
+struct BpfPin {
+    uint32_t Id;
+    std::string Path;
+    BpfObjectType ObjectType;
+};
+
 class BpfSystem {
 public:
 	static std::vector<BpfProgram> EnumPrograms();
     static std::unique_ptr<BpfProgram> GetProgramById(uint32_t id);
     static std::vector<BpfMap> EnumMaps();
     static std::vector<BpfLink> EnumLinks();
+    static std::vector<BpfPin> EnumPins();
+
     static std::vector<BpfMapItem> GetMapData(uint32_t id);
 
     static std::vector<BpfProgramEx> EnumProgramsInFile(const char* path, std::string* errMsg = nullptr);
@@ -165,6 +180,9 @@ public:
 
     static const char* GetProgramTypeName(GUID const& type);
     static const char* GetAttachTypeName(GUID const& type);
+
+    static bool Unpin(const char* path);
+    static bool PinMap(uint32_t id, const char* path);
 
     static int LoadProgramsFromFile(char const* path, const char* pinPath = nullptr, BpfExecutionType type = BpfExecutionType::Any);
     static bool UnloadProgram(const char* name, const char* pinPath, const char* filePath);

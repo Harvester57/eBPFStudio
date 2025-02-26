@@ -15,6 +15,10 @@
 #define IDI_STATS                       210
 #define IDI_CHECK                       211
 #define IDI_PROGRAM_LOAD                212
+#define IDI_PIN                         213
+#define IDD_PINPATH                     214
+#define IDI_UNPIN                       216
+#define IDC_PATH                        1000
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_OPTIONS                      32775
@@ -30,14 +34,16 @@
 #define ID_BPF_DETACHLINK               32786
 #define ID_BPF_PIN                      32787
 #define ID_BPF_UNPIN                    32788
+#define ID_EBPF_PINWITHPATH             32789
+#define ID_EBPF_UNPINWITHPATH           32790
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        213
-#define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_RESOURCE_VALUE        217
+#define _APS_NEXT_COMMAND_VALUE         32791
+#define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

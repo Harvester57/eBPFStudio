@@ -234,6 +234,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PinPathDlg.cpp" />
+    <ClCompile Include="PinsView.cpp" />
     <ClCompile Include="ProgramsView.cpp" />
     <ClCompile Include="StringHelper.cpp" />
   </ItemGroup>
@@ -244,6 +246,8 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MapsView.h" />
     <ClInclude Include="ObjectFileView.h" />
+    <ClInclude Include="PinPathDlg.h" />
+    <ClInclude Include="PinsView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ProgramsView.h" />
@@ -261,10 +265,12 @@
     <Image Include="res\link.ico" />
     <Image Include="res\Object.ico" />
     <Image Include="res\open.ico" />
+    <Image Include="res\pin.ico" />
     <Image Include="res\ProgramLoad.ico" />
     <Image Include="res\refresh.ico" />
     <Image Include="res\Statistics.ico" />
     <Image Include="res\System.ico" />
+    <Image Include="res\unpin.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\eBPFLib\eBPFLib.vcxproj">

@@ -102,6 +102,15 @@ PCWSTR StringHelper::AttachTypeToString(BpfAttachType type) {
     return L"(Unknown)";
 }
 
+PCWSTR StringHelper::ObjectTypeToString(BpfObjectType type) {
+    switch (type) {
+        case BpfObjectType::Program: return L"Program";
+        case BpfObjectType::Map: return L"Map";
+        case BpfObjectType::Link: return L"Link";
+    }
+    return L"Unknown";
+}
+
 CString StringHelper::GuidToString(GUID const& guid) {
     WCHAR text[64];
     ::StringFromGUID2(guid, text, _countof(text));

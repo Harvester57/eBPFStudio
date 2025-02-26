@@ -2,8 +2,23 @@
 #include "eBPF.h"
 #include <ebpf_api.h>
 #include <bpf/bpf.h>
+#include <ebpf_core_structs.h>
 #include <io.h>
 #include <wil\resource.h>
+
+typedef enum _ebpf_object_type {
+	EBPF_OBJECT_UNKNOWN,
+	EBPF_OBJECT_MAP,
+	EBPF_OBJECT_LINK,
+	EBPF_OBJECT_PROGRAM,
+} ebpf_object_type_t;
+
+extern "C" ebpf_result_t
+ebpf_get_next_pinned_object_path(
+	_In_z_ const char* start_path,
+	_Out_writes_z_(next_path_len) char* next_path,
+	size_t next_path_len,
+	_Inout_ ebpf_object_type_t* type) EBPF_NO_EXCEPT;
 
 namespace {
 	const PCWSTR ServiceNames[] = {
@@ -173,6 +188,86 @@ std::vector<BpfLink> BpfSystem::EnumLinks() {
 	return links;
 }
 
+std::vector<BpfPin> BpfSystem::EnumPins() {
+	//
+	// temporary workaround because the API is not in the import table
+	//
+	static const auto _ebpf_get_next_pinned_object_path = (decltype(ebpf_get_next_pinned_object_path)*)
+		::GetProcAddress(::GetModuleHandle(L"ebpfApi"), "ebpf_get_next_pinned_object_path");
+	if (!_ebpf_get_next_pinned_object_path)
+		return {};
+
+	std::vector<BpfPin> pins;
+	pins.reserve(8);
+	char path[EBPF_MAX_PIN_PATH_LENGTH] = "";
+
+	while (ebpf_get_next_pinned_program_path(path, path) == EBPF_SUCCESS) {
+		auto fd = bpf_obj_get(path);
+		if (fd < 0)
+			continue;
+		bpf_prog_info info{};
+		uint32_t size = sizeof(info);
+		if (bpf_obj_get_info_by_fd(fd, &info, &size) == 0) {
+			BpfPin pin;
+			pin.Id = info.id;
+			pin.Path = path;
+			pin.ObjectType = BpfObjectType::Program;
+			pins.push_back(std::move(pin));
+		}
+		LocalClose(fd);
+	}
+
+	path[0] = 0;
+	ebpf_object_type_t type;
+	while (_ebpf_get_next_pinned_object_path(path, path, sizeof(path), &type) == EBPF_SUCCESS) {
+		auto fd = bpf_obj_get(path);
+		if (fd < 0)
+			continue;
+		
+		BpfPin pin;
+		pin.Id = 0;
+		pin.ObjectType = (BpfObjectType)type;
+		pin.Path = path;
+		switch (type) {
+			case EBPF_OBJECT_PROGRAM:
+			{
+				bpf_prog_info info{};
+				uint32_t size = sizeof(info);
+				if (bpf_obj_get_info_by_fd(fd, &info, &size) == 0) {
+					pin.Id = info.id;
+				}
+				LocalClose(fd);
+				break;
+			}
+
+			case EBPF_OBJECT_MAP:
+			{
+				bpf_map_info info;
+				uint32_t size = sizeof(info);
+				if (bpf_obj_get_info_by_fd(fd, &info, &size) == 0) {
+					pin.Id = info.id;
+				}
+				LocalClose(fd);
+				break;
+			}
+
+			case EBPF_OBJECT_LINK:
+			{
+				bpf_link_info info;
+				uint32_t size = sizeof(info);
+				if (bpf_obj_get_info_by_fd(fd, &info, &size) == 0) {
+					pin.Id = info.id;
+				}
+				LocalClose(fd);
+				break;
+			}
+		}
+
+		pins.push_back(std::move(pin));
+	}
+	return pins;
+}
+
 std::vector<BpfMapItem> BpfSystem::GetMapData(uint32_t id) {
 	auto fd = bpf_map_get_fd_by_id(id);
 	if (fd < 0)
@@ -262,6 +357,21 @@ const char* BpfSystem::GetProgramTypeName(GUID const& type) {
 
 const char* BpfSystem::GetAttachTypeName(GUID const& type) {
 	return ebpf_get_attach_type_name(&type);
+}
+
+bool BpfSystem::Unpin(const char* path) {
+	return ebpf_object_unpin(path) == EBPF_SUCCESS;
+}
+
+bool BpfSystem::PinMap(uint32_t id, const char* path) {
+	auto fd = bpf_map_get_fd_by_id(id);
+	if (fd < 0)
+		return false;
+
+	auto success = bpf_obj_pin(fd, path) == 0;
+	LocalClose(fd);
+
+	return success;
 }
 
 int BpfSystem::LoadProgramsFromFile(char const* path, const char* pinPath, BpfExecutionType exeType) {
